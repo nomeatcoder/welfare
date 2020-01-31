@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nomeatcoder.dal.mapper.CategoryMapper">
+
+    <!-- 结果集对应关系 -->
+    <resultMap id="result" type="cn.nomeatcoder.common.domain.Category" >
+        <id column="id" property="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="name" column="name"/>
+        <result property="status" column="status"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 数据库字段 -->
+    <sql id="columns">
+        id, parent_id, name, status, sort_order, create_time, update_time
+    </sql>
+
+    <sql id="table">
+        category
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="conditions">
+        <where>
+            <choose>
+                <when test="id != null">and id = #{id}</when>
+                <otherwise>
+                    <if test="parentId != null">and parent_id = #{parentId}</if>
+                    <if test="name != null">and name = #{name}</if>
+                    <if test="status != null">and status = #{status}</if>
+                    <if test="sortOrder != null">and sort_order = #{sortOrder}</if>
+                    <if test="createTime != null">and create_time = #{createTime}</if>
+                    <if test="updateTime != null">and update_time = #{updateTime}</if>
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
+
+    <!-- 查询结果集 -->
+    <select id="find" resultMap="result"
+            parameterType="cn.nomeatcoder.common.query.CategoryQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        <if test="orderByEnable and orderByList != null and orderByList.size() > 0">
+            order by
+            <foreach collection="orderByList" item="orderBy" separator=",">
+                ${orderBy.column} ${orderBy.sort}
+            </foreach>
+        </if>
+        <if test="pageEnable">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 查询某条记录 -->
+    <select id="get" resultMap="result" parameterType="cn.nomeatcoder.common.query.CategoryQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        limit 1
+    </select>
+
+    <!-- 统计查询结果数量 -->
+    <select id="count" resultType="long" parameterType="cn.nomeatcoder.common.query.CategoryQuery">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="conditions"/>
+    </select>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="cn.nomeatcoder.common.query.CategoryQuery">
+        delete from
+        <include refid="table"/>
+        where id = #{id}
+    </delete>
+
+    <!-- 插入 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="cn.nomeatcoder.common.domain.Category">
+        insert into
+        <include refid="table"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="sortOrder != null">
+                sort_order,
+            </if>
+
+                create_time,
+
+                update_time,
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id, jdbcType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                #{parentId, jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status, jdbcType=BIT},
+            </if>
+            <if test="sortOrder != null">
+                #{sortOrder, jdbcType=INTEGER},
+            </if>
+            now(),
+            now(),
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="cn.nomeatcoder.common.domain.Category">
+        UPDATE
+        <include refid="table"/>
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId, jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status, jdbcType=BIT},
+            </if>
+            <if test="sortOrder != null">
+                sort_order = #{sortOrder, jdbcType=INTEGER},
+            </if>
+            update_time = now()
+
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+</mapper>

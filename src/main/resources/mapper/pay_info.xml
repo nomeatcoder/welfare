@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nomeatcoder.dal.mapper.PayInfoMapper">
+
+    <!-- 结果集对应关系 -->
+    <resultMap id="result" type="cn.nomeatcoder.common.domain.PayInfo">
+        <id column="id" property="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="payPlatform" column="pay_platform"/>
+        <result property="platformNumber" column="platform_number"/>
+        <result property="platformStatus" column="platform_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 数据库字段 -->
+    <sql id="columns">
+        id, user_id, order_no, pay_platform, platform_number, platform_status, create_time, update_time
+    </sql>
+
+    <sql id="table">
+        pay_info
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="conditions">
+        <where>
+            <choose>
+                <when test="id != null">and id = #{id}</when>
+                <otherwise>
+                    <if test="userId != null">and user_id = #{userId}</if>
+                    <if test="orderNo != null">and order_no = #{orderNo}</if>
+                    <if test="payPlatform != null">and pay_platform = #{payPlatform}</if>
+                    <if test="platformNumber != null">and platform_number = #{platformNumber}</if>
+                    <if test="platformStatus != null">and platform_status = #{platformStatus}</if>
+                    <if test="createTime != null">and create_time = #{createTime}</if>
+                    <if test="updateTime != null">and update_time = #{updateTime}</if>
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
+
+    <!-- 查询结果集 -->
+    <select id="find" resultMap="result"
+            parameterType="cn.nomeatcoder.common.query.PayInfoQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        <if test="orderByEnable and orderByList != null and orderByList.size() > 0">
+            order by
+            <foreach collection="orderByList" item="orderBy" separator=",">
+                ${orderBy.column} ${orderBy.sort}
+            </foreach>
+        </if>
+        <if test="pageEnable">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 查询某条记录 -->
+    <select id="get" resultMap="result" parameterType="cn.nomeatcoder.common.query.PayInfoQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        limit 1
+    </select>
+
+    <!-- 统计查询结果数量 -->
+    <select id="count" resultType="long" parameterType="cn.nomeatcoder.common.query.PayInfoQuery">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="conditions"/>
+    </select>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="cn.nomeatcoder.common.query.PayInfoQuery">
+        delete from
+        <include refid="table"/>
+        where id = #{id}
+    </delete>
+
+    <!-- 插入 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="cn.nomeatcoder.common.domain.PayInfo">
+        insert into
+        <include refid="table"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="orderNo != null">
+                order_no,
+            </if>
+            <if test="payPlatform != null">
+                pay_platform,
+            </if>
+            <if test="platformNumber != null">
+                platform_number,
+            </if>
+            <if test="platformStatus != null">
+                platform_status,
+            </if>
+
+            create_time,
+
+            update_time,
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id, jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId, jdbcType=INTEGER},
+            </if>
+            <if test="orderNo != null">
+                #{orderNo, jdbcType=BIGINT},
+            </if>
+            <if test="payPlatform != null">
+                #{payPlatform, jdbcType=INTEGER},
+            </if>
+            <if test="platformNumber != null">
+                #{platformNumber, jdbcType=VARCHAR},
+            </if>
+            <if test="platformStatus != null">
+                #{platformStatus, jdbcType=VARCHAR},
+            </if>
+            now(),
+            now(),
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="cn.nomeatcoder.common.domain.PayInfo">
+        UPDATE
+        <include refid="table"/>
+        <set>
+            <if test="userId != null">
+                user_id = #{userId, jdbcType=INTEGER},
+            </if>
+            <if test="orderNo != null">
+                order_no = #{orderNo, jdbcType=BIGINT},
+            </if>
+            <if test="payPlatform != null">
+                pay_platform = #{payPlatform, jdbcType=INTEGER},
+            </if>
+            <if test="platformNumber != null">
+                platform_number = #{platformNumber, jdbcType=VARCHAR},
+            </if>
+            <if test="platformStatus != null">
+                platform_status = #{platformStatus, jdbcType=VARCHAR},
+            </if>
+            update_time = now()
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+</mapper>

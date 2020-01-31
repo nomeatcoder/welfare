@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nomeatcoder.dal.mapper.ProductMapper">
+
+    <!-- 结果集对应关系 -->
+    <resultMap id="result" type="cn.nomeatcoder.common.domain.Product">
+        <id column="id" property="id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="name" column="name"/>
+        <result property="subtitle" column="subtitle"/>
+        <result property="mainImage" column="main_image"/>
+        <result property="subImages" column="sub_images"/>
+        <result property="detail" column="detail"/>
+        <result property="price" column="price"/>
+        <result property="stock" column="stock"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 数据库字段 -->
+    <sql id="columns">
+        id, category_id, name, subtitle, main_image, sub_images, detail, price, stock, status, create_time, update_time
+    </sql>
+
+    <sql id="table">
+        product
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="conditions">
+        <where>
+            <choose>
+                <when test="id != null">and id = #{id}</when>
+                <otherwise>
+                    <if test="categoryId != null">and category_id = #{categoryId}</if>
+                    <if test="name != null">and name = #{name}</if>
+                    <if test="subtitle != null">and subtitle = #{subtitle}</if>
+                    <if test="mainImage != null">and main_image = #{mainImage}</if>
+                    <if test="subImages != null">and sub_images = #{subImages}</if>
+                    <if test="detail != null">and detail = #{detail}</if>
+                    <if test="price != null">and price = #{price}</if>
+                    <if test="stock != null">and stock = #{stock}</if>
+                    <if test="status != null">and status = #{status}</if>
+                    <if test="createTime != null">and create_time = #{createTime}</if>
+                    <if test="updateTime != null">and update_time = #{updateTime}</if>
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
+
+    <!-- 查询结果集 -->
+    <select id="find" resultMap="result"
+            parameterType="cn.nomeatcoder.common.query.ProductQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        <if test="orderByEnable and orderByList != null and orderByList.size() > 0">
+            order by
+            <foreach collection="orderByList" item="orderBy" separator=",">
+                ${orderBy.column} ${orderBy.sort}
+            </foreach>
+        </if>
+        <if test="pageEnable">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 查询某条记录 -->
+    <select id="get" resultMap="result" parameterType="cn.nomeatcoder.common.query.ProductQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        limit 1
+    </select>
+
+    <!-- 统计查询结果数量 -->
+    <select id="count" resultType="long" parameterType="cn.nomeatcoder.common.query.ProductQuery">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="conditions"/>
+    </select>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="cn.nomeatcoder.common.query.ProductQuery">
+        delete from
+        <include refid="table"/>
+        where id = #{id}
+    </delete>
+
+    <!-- 插入 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="cn.nomeatcoder.common.domain.Product">
+        insert into
+        <include refid="table"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="categoryId != null">
+                category_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="subtitle != null">
+                subtitle,
+            </if>
+            <if test="mainImage != null">
+                main_image,
+            </if>
+            <if test="subImages != null">
+                sub_images,
+            </if>
+            <if test="detail != null">
+                detail,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="stock != null">
+                stock,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+
+            create_time,
+
+            update_time,
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id, jdbcType=INTEGER},
+            </if>
+            <if test="categoryId != null">
+                #{categoryId, jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="subtitle != null">
+                #{subtitle, jdbcType=VARCHAR},
+            </if>
+            <if test="mainImage != null">
+                #{mainImage, jdbcType=VARCHAR},
+            </if>
+            <if test="subImages != null">
+                #{subImages, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="detail != null">
+                #{detail, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="price != null">
+                #{price, jdbcType=DECIMAL},
+            </if>
+            <if test="stock != null">
+                #{stock, jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status, jdbcType=INTEGER},
+            </if>
+            now(),
+            now(),
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="cn.nomeatcoder.common.domain.Product">
+        UPDATE
+        <include refid="table"/>
+        <set>
+            <if test="categoryId != null">
+                category_id = #{categoryId, jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="subtitle != null">
+                subtitle = #{subtitle, jdbcType=VARCHAR},
+            </if>
+            <if test="mainImage != null">
+                main_image = #{mainImage, jdbcType=VARCHAR},
+            </if>
+            <if test="subImages != null">
+                sub_images = #{subImages, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="detail != null">
+                detail = #{detail, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="price != null">
+                price = #{price, jdbcType=DECIMAL},
+            </if>
+            <if test="stock != null">
+                stock = #{stock, jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status, jdbcType=INTEGER},
+            </if>
+            update_time = now()
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+</mapper>

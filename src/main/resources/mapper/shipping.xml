@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nomeatcoder.dal.mapper.ShippingMapper">
+
+    <!-- 结果集对应关系 -->
+    <resultMap id="result" type="cn.nomeatcoder.common.domain.Shipping">
+        <id column="id" property="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="receiverName" column="receiver_name"/>
+        <result property="receiverPhone" column="receiver_phone"/>
+        <result property="receiverMobile" column="receiver_mobile"/>
+        <result property="receiverProvince" column="receiver_province"/>
+        <result property="receiverCity" column="receiver_city"/>
+        <result property="receiverDistrict" column="receiver_district"/>
+        <result property="receiverAddress" column="receiver_address"/>
+        <result property="receiverZip" column="receiver_zip"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 数据库字段 -->
+    <sql id="columns">
+        id, user_id, receiver_name, receiver_phone, receiver_mobile, receiver_province, receiver_city, receiver_district, receiver_address, receiver_zip, create_time, update_time
+    </sql>
+
+    <sql id="table">
+        shipping
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="conditions">
+        <where>
+            <choose>
+                <when test="id != null">and id = #{id}</when>
+                <otherwise>
+                    <if test="userId != null">and user_id = #{userId}</if>
+                    <if test="receiverName != null">and receiver_name = #{receiverName}</if>
+                    <if test="receiverPhone != null">and receiver_phone = #{receiverPhone}</if>
+                    <if test="receiverMobile != null">and receiver_mobile = #{receiverMobile}</if>
+                    <if test="receiverProvince != null">and receiver_province = #{receiverProvince}</if>
+                    <if test="receiverCity != null">and receiver_city = #{receiverCity}</if>
+                    <if test="receiverDistrict != null">and receiver_district = #{receiverDistrict}</if>
+                    <if test="receiverAddress != null">and receiver_address = #{receiverAddress}</if>
+                    <if test="receiverZip != null">and receiver_zip = #{receiverZip}</if>
+                    <if test="createTime != null">and create_time = #{createTime}</if>
+                    <if test="updateTime != null">and update_time = #{updateTime}</if>
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
+
+    <!-- 查询结果集 -->
+    <select id="find" resultMap="result"
+            parameterType="cn.nomeatcoder.common.query.ShippingQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        <if test="orderByEnable and orderByList != null and orderByList.size() > 0">
+            order by
+            <foreach collection="orderByList" item="orderBy" separator=",">
+                ${orderBy.column} ${orderBy.sort}
+            </foreach>
+        </if>
+        <if test="pageEnable">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 查询某条记录 -->
+    <select id="get" resultMap="result" parameterType="cn.nomeatcoder.common.query.ShippingQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        limit 1
+    </select>
+
+    <!-- 统计查询结果数量 -->
+    <select id="count" resultType="long" parameterType="cn.nomeatcoder.common.query.ShippingQuery">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="conditions"/>
+    </select>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="cn.nomeatcoder.common.query.ShippingQuery">
+        delete from
+        <include refid="table"/>
+        where id = #{id}
+    </delete>
+
+    <!-- 插入 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="cn.nomeatcoder.common.domain.Shipping">
+        insert into
+        <include refid="table"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="receiverName != null">
+                receiver_name,
+            </if>
+            <if test="receiverPhone != null">
+                receiver_phone,
+            </if>
+            <if test="receiverMobile != null">
+                receiver_mobile,
+            </if>
+            <if test="receiverProvince != null">
+                receiver_province,
+            </if>
+            <if test="receiverCity != null">
+                receiver_city,
+            </if>
+            <if test="receiverDistrict != null">
+                receiver_district,
+            </if>
+            <if test="receiverAddress != null">
+                receiver_address,
+            </if>
+            <if test="receiverZip != null">
+                receiver_zip,
+            </if>
+
+            create_time,
+
+            update_time,
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id, jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId, jdbcType=INTEGER},
+            </if>
+            <if test="receiverName != null">
+                #{receiverName, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverPhone != null">
+                #{receiverPhone, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverMobile != null">
+                #{receiverMobile, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverProvince != null">
+                #{receiverProvince, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverCity != null">
+                #{receiverCity, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverDistrict != null">
+                #{receiverDistrict, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverAddress != null">
+                #{receiverAddress, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverZip != null">
+                #{receiverZip, jdbcType=VARCHAR},
+            </if>
+            now(),
+            now(),
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="cn.nomeatcoder.common.domain.Shipping">
+        UPDATE
+        <include refid="table"/>
+        <set>
+            <if test="userId != null">
+                user_id = #{userId, jdbcType=INTEGER},
+            </if>
+            <if test="receiverName != null">
+                receiver_name = #{receiverName, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverPhone != null">
+                receiver_phone = #{receiverPhone, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverMobile != null">
+                receiver_mobile = #{receiverMobile, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverProvince != null">
+                receiver_province = #{receiverProvince, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverCity != null">
+                receiver_city = #{receiverCity, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverDistrict != null">
+                receiver_district = #{receiverDistrict, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverAddress != null">
+                receiver_address = #{receiverAddress, jdbcType=VARCHAR},
+            </if>
+            <if test="receiverZip != null">
+                receiver_zip = #{receiverZip, jdbcType=VARCHAR},
+            </if>
+            update_time = now()
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+</mapper>
