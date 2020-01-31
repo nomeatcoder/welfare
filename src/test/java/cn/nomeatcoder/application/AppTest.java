@@ -1,6 +1,7 @@
 package cn.nomeatcoder.application;
 
 import cn.nomeatcoder.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,11 +16,12 @@ import javax.annotation.Resource;
  */
 @RunWith(SpringRunner.class)
 @TestPropertySource(
-	locations = {"classpath:application.properties"}
+	locations = {"classpath:application-test.properties"}
 )
 @MapperScan(basePackages = {
 	"cn.nomeatcoder.mapper"
 })
+@Slf4j
 public class AppTest {
 
 	@Resource
@@ -28,6 +30,7 @@ public class AppTest {
 	@Test
 	public void test() {
 		System.out.println("success");
+		log.info("-------------success--------------");
 	}
 
 	@Test
