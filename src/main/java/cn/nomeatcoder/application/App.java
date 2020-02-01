@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = {
     "cn.nomeatcoder.controller",
     "cn.nomeatcoder.service",
+    "cn.nomeatcoder.common",
 })
 @MapperScan(basePackages = {
     "cn.nomeatcoder.dal.mapper"

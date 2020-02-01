@@ -19,7 +19,7 @@ public class ServerResponse implements Serializable {
 	}
 
 	public static ServerResponse success(Object data) {
-		return new ServerResponse(0, "操作成功", data);
+		return new ServerResponse(0, "成功", data);
 	}
 
 	public static ServerResponse success() {
@@ -28,6 +28,10 @@ public class ServerResponse implements Serializable {
 
 	public static ServerResponse error(String msg) {
 		return new ServerResponse(1, msg, null);
+	}
+
+	public static ServerResponse error() {
+		return new ServerResponse(1, "操作失败", null);
 	}
 
 	@JsonIgnore
