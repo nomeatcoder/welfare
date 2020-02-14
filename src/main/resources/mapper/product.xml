@@ -35,7 +35,6 @@
                 <when test="id != null">and id = #{id}</when>
                 <otherwise>
                     <if test="categoryId != null">and category_id = #{categoryId}</if>
-                    <if test="name != null">and name = #{name}</if>
                     <if test="subtitle != null">and subtitle = #{subtitle}</if>
                     <if test="mainImage != null">and main_image = #{mainImage}</if>
                     <if test="subImages != null">and sub_images = #{subImages}</if>
@@ -209,4 +208,52 @@
         WHERE
         id = #{id}
     </update>
+    <select id="selectByNameAndProductId" resultMap="result" parameterType="cn.nomeatcoder.common.query.ProductQuery">
+        SELECT
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <where>
+            <if test="productId != null">
+                and id = #{productId}
+            </if>
+            <if test="name != null">
+                and name like #{name}
+            </if>
+        </where>
+        <if test="orderByEnable and orderByList != null and orderByList.size() > 0">
+            order by
+            <foreach collection="orderByList" item="orderBy" separator=",">
+                ${orderBy.column} ${orderBy.sort}
+            </foreach>
+        </if>
+        <if test="pageEnable">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
+    <select id="selectByNameAndCategoryIds" resultMap="result" parameterType="cn.nomeatcoder.common.query.ProductQuery">
+        SELECT
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        where status = 1
+        <if test="name != null">
+            and name like #{name}
+        </if>
+        <if test="categoryIdList != null" >
+            and category_id in
+            <foreach item="item" index="index" open="(" separator="," close=")" collection="categoryIdList">
+                #{item}
+            </foreach>
+        </if>
+        <if test="orderByEnable and orderByList != null and orderByList.size() > 0">
+            order by
+            <foreach collection="orderByList" item="orderBy" separator=",">
+                ${orderBy.column} ${orderBy.sort}
+            </foreach>
+        </if>
+        <if test="pageEnable">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
 </mapper>

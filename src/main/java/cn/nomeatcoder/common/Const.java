@@ -1,9 +1,9 @@
 package cn.nomeatcoder.common;
 
 import com.google.common.collect.Sets;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 public class Const {
@@ -12,6 +12,9 @@ public class Const {
 
 	public static final String EMAIL = "email";
 	public static final String USERNAME = "username";
+	public static final String ASC = "asc";
+	public static final String IMAGE_HOST = "http://img.welfare.com/";
+	public static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public interface ProductListOrderBy{
 		Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_desc","price_asc");

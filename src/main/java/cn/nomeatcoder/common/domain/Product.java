@@ -3,6 +3,7 @@ package cn.nomeatcoder.common.domain;
 import cn.nomeatcoder.common.Domain;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -46,7 +47,7 @@ public class Product implements Domain {
 	/**
 	 * 价格,单位-元保留两位小数
 	 */
-	private Float price;
+	private BigDecimal price;
 	/**
 	 * 库存数量
 	 */

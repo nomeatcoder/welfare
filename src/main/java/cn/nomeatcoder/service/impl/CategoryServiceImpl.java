@@ -33,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = new Category();
 		category.setName(categoryName);
 		category.setParentId(parentId);
+		category.setStatus(true);
 
 		long rowCount = categoryMapper.insert(category);
 		if (rowCount > 0) {
