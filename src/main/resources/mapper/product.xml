@@ -215,7 +215,7 @@
         <include refid="table"/>
         <where>
             <if test="productId != null">
-                and id = #{productId}
+                and id = #{id}
             </if>
             <if test="name != null">
                 and name like #{name}
@@ -240,9 +240,9 @@
         <if test="name != null">
             and name like #{name}
         </if>
-        <if test="categoryIdList != null" >
+        <if test="categoryIdList != null and categoryIdList.size() > 0" >
             and category_id in
-            <foreach item="item" index="index" open="(" separator="," close=")" collection="categoryIdList">
+            <foreach item="item" open="(" separator="," close=")" collection="categoryIdList">
                 #{item}
             </foreach>
         </if>
