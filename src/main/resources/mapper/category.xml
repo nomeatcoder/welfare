@@ -78,7 +78,7 @@
     </select>
 
     <!-- 删除 -->
-    <delete id="delete" parameterType="cn.nomeatcoder.common.query.CategoryQuery">
+    <delete id="delete">
         delete from
         <include refid="table"/>
         where id = #{id}

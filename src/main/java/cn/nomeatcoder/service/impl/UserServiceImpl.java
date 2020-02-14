@@ -9,12 +9,14 @@ import cn.nomeatcoder.common.query.UserQuery;
 import cn.nomeatcoder.dal.mapper.UserMapper;
 import cn.nomeatcoder.service.UserService;
 import cn.nomeatcoder.utils.MD5Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.UUID;
 
+@Slf4j
 @Service("userService")
 public class UserServiceImpl implements UserService {
 

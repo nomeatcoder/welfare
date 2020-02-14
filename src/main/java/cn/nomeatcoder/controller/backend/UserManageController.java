@@ -19,6 +19,7 @@ public class UserManageController {
 	@Resource
 	private UserService userService;
 
+
 	@PostMapping("login.do")
 	@ResponseBody
 	public ServerResponse login(String username, String password, HttpSession session) {

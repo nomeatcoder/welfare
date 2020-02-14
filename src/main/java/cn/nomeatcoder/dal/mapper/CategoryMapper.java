@@ -11,4 +11,5 @@ import cn.nomeatcoder.common.query.CategoryQuery;
  * @Date 2020-01-31 14:38:45
  */
 public interface CategoryMapper extends Mapper<CategoryQuery, Category> {
+	int delete(Integer id);
 }
