@@ -5,6 +5,7 @@ import cn.nomeatcoder.common.QueryBase;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 查询类
@@ -37,4 +38,8 @@ public class CartQuery extends QueryBase {
 	 * 更新时间
 	 */
 	private Date updateTime;
+	/**
+	 * 产品id列表
+	 */
+	private List<Integer> productIdList;
 }
