@@ -214,7 +214,7 @@
         from
         <include refid="table"/>
         <where>
-            <if test="productId != null">
+            <if test="id != null">
                 and id = #{id}
             </if>
             <if test="name != null">

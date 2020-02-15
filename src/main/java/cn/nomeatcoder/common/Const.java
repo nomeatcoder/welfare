@@ -3,7 +3,6 @@ package cn.nomeatcoder.common;
 import com.google.common.collect.Sets;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 public class Const {
@@ -13,7 +12,10 @@ public class Const {
 	public static final String EMAIL = "email";
 	public static final String USERNAME = "username";
 	public static final String ASC = "asc";
-	public static final String IMAGE_HOST = "http://img.welfare.com/";
+	public static final String IMAGE_HOST = "http://image.welfare.com/";
+	public static final String FTP_SERVER_IP = "192.168.0.10";
+	public static final String FTP_USERNAME = "ftpuser";
+	public static final String FTP_PASSWORD = "123456";
 	public static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public interface ProductListOrderBy{

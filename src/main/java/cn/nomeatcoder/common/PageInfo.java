@@ -25,12 +25,12 @@ public class PageInfo<T> {
 	//是否有后一页
 	private boolean hasNextPage= false;
 
-	public void init(int pageNum, int pageSize, List<T> list) {
-		this.total = list.size();
+	public void init(long count, int pageNum, int pageSize, List<T> list) {
+		this.total = count;
 		this.pageNum = pageNum;
 		this.pageSize = pageSize;
 		this.list = list;
-		this.pages = (int) ((this.total + pageSize - 1)/ pageSize);
+		this.pages = (int) ((count + pageSize - 1) / pageSize);
 		if(pageNum > 1){
 			this.prePage = pageNum -1;
 			this.hasPreviousPage = true;

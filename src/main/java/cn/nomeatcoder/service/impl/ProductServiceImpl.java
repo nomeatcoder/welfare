@@ -140,7 +140,7 @@ public class ProductServiceImpl implements ProductService {
 			productListVoList.add(productListVo);
 		}
 		PageInfo pageInfo = new PageInfo();
-		pageInfo.init(pageNum, pageSize, productListVoList);
+		pageInfo.init(productMapper.count(query), pageNum, pageSize, productListVoList);
 		return ServerResponse.success(pageInfo);
 	}
 
@@ -176,7 +176,7 @@ public class ProductServiceImpl implements ProductService {
 			productListVoList.add(productListVo);
 		}
 		PageInfo pageInfo = new PageInfo();
-		pageInfo.init(pageNum, pageSize, productListVoList);
+		pageInfo.init(productMapper.count(query), pageNum, pageSize, productListVoList);
 		return ServerResponse.success(pageInfo);
 	}
 
@@ -243,7 +243,7 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		PageInfo pageInfo = new PageInfo();
-		pageInfo.init(pageNum, pageSize, productListVoList);
+		pageInfo.init(productMapper.count(query), pageNum, pageSize, productListVoList);
 		return ServerResponse.success(pageInfo);
 	}
 
