@@ -91,7 +91,7 @@
     <delete id="delete" parameterType="cn.nomeatcoder.common.query.ShippingQuery">
         delete from
         <include refid="table"/>
-        where id = #{id}
+        <include refid="conditions"/>
     </delete>
 
     <!-- 插入 -->

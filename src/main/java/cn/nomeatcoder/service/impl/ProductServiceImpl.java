@@ -206,7 +206,7 @@ public class ProductServiceImpl implements ProductService {
 		}
 		ProductQuery query = new ProductQuery();
 		query.setId(productId);
-		long rowCount = productMapper.delete(query);
+		int rowCount = productMapper.delete(query);
 		if (rowCount > 0) {
 			return ServerResponse.success("删除产品成功");
 		}

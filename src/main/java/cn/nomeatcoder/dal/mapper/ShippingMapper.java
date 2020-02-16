@@ -12,4 +12,5 @@ import cn.nomeatcoder.common.query.ShippingQuery;
  * @Date 2020-01-31 14:38:45
  */
 public interface ShippingMapper extends Mapper<ShippingQuery, Shipping> {
+	int delete(ShippingQuery query);
 }
