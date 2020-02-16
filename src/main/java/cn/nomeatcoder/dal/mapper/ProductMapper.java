@@ -15,6 +15,7 @@ import java.util.List;
  * @Date 2020-01-31 14:38:45
  */
 public interface ProductMapper extends Mapper<ProductQuery, Product> {
+	long delete(ProductQuery query);
 	List<Product> selectByNameAndProductId(ProductQuery query);
 	List<Product> selectByNameAndCategoryIds(ProductQuery query);
 

@@ -53,7 +53,7 @@ public class ProductQuery extends QueryBase {
     */
 	private Integer stock;
     /**
-    * 商品状态.1-在售 2-下架 3-删除
+    * 商品状态.1-在售 2-下架
     */
 	private Integer status;
     /**

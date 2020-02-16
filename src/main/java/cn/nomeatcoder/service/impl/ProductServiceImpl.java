@@ -199,6 +199,20 @@ public class ProductServiceImpl implements ProductService {
 		return ServerResponse.success(productDetailVo);
 	}
 
+	@Override
+	public ServerResponse deleteProduct(Integer productId) {
+		if (productId == null) {
+			return ServerResponse.error(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+		}
+		ProductQuery query = new ProductQuery();
+		query.setId(productId);
+		long rowCount = productMapper.delete(query);
+		if (rowCount > 0) {
+			return ServerResponse.success("删除产品成功");
+		}
+		return ServerResponse.error("删除产品失败");
+	}
+
 
 	@Override
 	public ServerResponse getProductByKeywordCategory(String keyword, Integer categoryId, int pageNum, int pageSize, String orderBy) {

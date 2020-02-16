@@ -18,6 +18,8 @@ public interface ProductService {
 
     ServerResponse getProductDetail(Integer productId);
 
+    ServerResponse deleteProduct(Integer productId);
+
     ServerResponse getProductByKeywordCategory(String keyword, Integer categoryId, int pageNum, int pageSize, String orderBy);
 
 
