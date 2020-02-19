@@ -12,11 +12,12 @@
         <result property="sortOrder" column="sort_order"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
+        <result property="image" column="image"/>
     </resultMap>
 
     <!-- 数据库字段 -->
     <sql id="columns">
-        id, parent_id, name, status, sort_order, create_time, update_time
+        id, parent_id, name, status, sort_order, create_time, update_time, image
     </sql>
 
     <sql id="table">
@@ -105,6 +106,9 @@
             <if test="sortOrder != null">
                 sort_order,
             </if>
+            <if test="image != null">
+                image,
+            </if>
 
                 create_time,
 
@@ -127,6 +131,9 @@
             <if test="sortOrder != null">
                 #{sortOrder, jdbcType=INTEGER},
             </if>
+            <if test="image != null">
+                #{image, jdbcType=VARCHAR},
+            </if>
             now(),
             now(),
         </trim>
@@ -148,6 +155,9 @@
             </if>
             <if test="sortOrder != null">
                 sort_order = #{sortOrder, jdbcType=INTEGER},
+            </if>
+            <if test="image != null">
+                image = #{image, jdbcType=VARCHAR},
             </if>
             update_time = now()
 

@@ -43,4 +43,8 @@ public class Category implements Domain {
 	 * 更新时间
 	 */
 	private Date updateTime;
+	/**
+	 * 图片，二级分类必须有
+	 */
+	private String image;
 }

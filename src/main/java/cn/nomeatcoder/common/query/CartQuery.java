@@ -39,7 +39,12 @@ public class CartQuery extends QueryBase {
 	 */
 	private Date updateTime;
 	/**
+	 * 图片，二级分类必须有
+	 */
+	private String image;
+	/**
 	 * 产品id列表
 	 */
 	private List<Integer> productIdList;
+
 }
