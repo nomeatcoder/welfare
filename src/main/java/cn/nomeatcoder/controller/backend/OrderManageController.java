@@ -1,11 +1,9 @@
 package cn.nomeatcoder.controller.backend;
 
 import cn.nomeatcoder.common.Const;
-import cn.nomeatcoder.common.PageInfo;
 import cn.nomeatcoder.common.ResponseCode;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.User;
-import cn.nomeatcoder.common.vo.OrderVo;
 import cn.nomeatcoder.service.OrderService;
 import cn.nomeatcoder.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +17,7 @@ import javax.servlet.http.HttpSession;
 
 @Slf4j
 @Controller
-@RequestMapping("/manage/order")
+@RequestMapping("manage/order")
 public class OrderManageController {
 
     @Resource

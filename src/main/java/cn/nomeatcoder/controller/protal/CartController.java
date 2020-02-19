@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 
 
 @Controller
-@RequestMapping("/cart/")
+@RequestMapping("cart")
 public class CartController {
 
 	@Resource

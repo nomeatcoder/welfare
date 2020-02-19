@@ -1,9 +1,11 @@
 package cn.nomeatcoder.service.impl;
 
-import afu.org.checkerframework.checker.units.qual.C;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.Category;
 import cn.nomeatcoder.common.query.CategoryQuery;
+import cn.nomeatcoder.common.vo.CategoryDetailVo;
+import cn.nomeatcoder.common.vo.CategoryVo;
+import cn.nomeatcoder.common.vo.IndexVo;
 import cn.nomeatcoder.dal.mapper.CategoryMapper;
 import cn.nomeatcoder.service.CategoryService;
 import com.google.common.collect.Lists;
@@ -14,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("categoryService")
@@ -23,6 +25,45 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Resource
 	private CategoryMapper categoryMapper;
+
+	@Override
+	public ServerResponse getIndex() {
+		CategoryQuery query = new CategoryQuery();
+		List<Category> list = categoryMapper.find(query);
+		HashMap<Integer,List<Category>> map = new HashMap<>();
+		HashMap<Integer,String> mappingMap = new HashMap<>();
+		for (Category category : list) {
+			//如果是一级分类
+			if(category.getParentId()==0){
+				mappingMap.put(category.getId(),category.getName());
+			}
+			//如果是二级分类
+			else{
+				List<Category> cartgoryList = map.getOrDefault(category.getParentId(), new ArrayList<>());
+				cartgoryList.add(category);
+				map.put(category.getParentId(),cartgoryList);
+			}
+		}
+		IndexVo indexVo = new IndexVo();
+		indexVo.setList(new ArrayList<>());
+		for (List<Category> value : map.values()) {
+			if(value!=null && value.size()>0) {
+				CategoryDetailVo categoryDetailVo = new CategoryDetailVo();
+				categoryDetailVo.setName(mappingMap.get(value.get(0).getParentId()));
+				categoryDetailVo.setParentId(value.get(0).getParentId());
+				categoryDetailVo.setSubList(value.stream().map(v->{
+					CategoryVo categoryVo = new CategoryVo();
+					categoryVo.setId(v.getId());
+					categoryVo.setName(v.getName());
+					categoryVo.setParentId(v.getParentId());
+					categoryVo.setImage(v.getImage());
+					return categoryVo;
+				}).collect(Collectors.toList()));
+				indexVo.getList().add(categoryDetailVo);
+			}
+		}
+		return ServerResponse.success(indexVo);
+	}
 
 	@Override
 	public ServerResponse addCategory(String categoryName, Integer parentId, String image) {

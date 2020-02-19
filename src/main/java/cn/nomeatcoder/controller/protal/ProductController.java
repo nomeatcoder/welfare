@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 
 @Controller
-@RequestMapping("/product/")
+@RequestMapping("product")
 public class ProductController {
 
 	@Resource

@@ -25,7 +25,7 @@ import java.util.Map;
 
 @Slf4j
 @Controller
-@RequestMapping("/order/")
+@RequestMapping("order")
 public class OrderController {
 
     @Resource

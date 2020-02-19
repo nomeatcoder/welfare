@@ -76,7 +76,7 @@ public class QueryBase implements Query, Serializable {
 	}
 
 	protected int getDefaultPageSize() {
-		return 20;
+		return 100000;
 	}
 
 	@Override

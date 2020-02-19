@@ -23,7 +23,7 @@ import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/manage/product")
+@RequestMapping("manage/product")
 public class ProductManageController {
 
 	@Resource

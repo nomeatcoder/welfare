@@ -15,12 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-/**
- * Created by geely
- */
 
 @Controller
-@RequestMapping("/shipping/")
+@RequestMapping("shipping")
 public class ShippingController {
 
     @Resource
