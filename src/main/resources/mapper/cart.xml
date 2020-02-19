@@ -188,4 +188,14 @@
         WHERE
         id = #{id}
     </update>
+
+    <!-- 删除 -->
+    <delete id="deleteBatch" parameterType="cn.nomeatcoder.common.query.CartQuery">
+            delete from
+            <include refid="table"/>
+            where id in
+            <foreach item="item" index="index" open="(" separator="," close=")" collection="list">
+                #{item.id}
+            </foreach>
+    </delete>
 </mapper>

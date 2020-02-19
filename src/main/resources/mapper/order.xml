@@ -27,7 +27,7 @@
     </sql>
 
     <sql id="table">
-        order
+        `order`
     </sql>
 
     <!-- 查询条件 -->

@@ -16,6 +16,8 @@ public class Const {
 	public static final String FTP_SERVER_IP = "192.168.0.10";
 	public static final String FTP_USERNAME = "ftpuser";
 	public static final String FTP_PASSWORD = "123456";
+	//线上域名需要备案,所以本机用内网穿透验证,线上不验证
+	public static final String ALIPAY_CALLBACK_URL = "http://dfuyyu.natappfree.cc/order/alipay_callback.do";
 	public static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public interface ProductListOrderBy{

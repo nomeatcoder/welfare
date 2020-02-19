@@ -256,4 +256,23 @@
             limit #{startRow}, #{pageSize}
         </if>
     </select>
+
+    <update id="reduceStock" parameterType="cn.nomeatcoder.common.domain.OrderItem">
+
+        UPDATE
+        <include refid="table"/>
+        <set>
+            update_time = now(),
+            stock = stock -
+            case id
+            <foreach collection="list" item="item" separator=" ">
+                when #{item.productId} then #{item.quantity}
+            </foreach>
+            end
+        </set>
+        WHERE id in
+        <foreach item="item" open="(" separator="," close=")" collection="list">
+            #{item.productId}
+        </foreach>
+    </update>
 </mapper>

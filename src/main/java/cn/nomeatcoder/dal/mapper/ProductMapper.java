@@ -1,6 +1,7 @@
 package cn.nomeatcoder.dal.mapper;
 
 import cn.nomeatcoder.common.Mapper;
+import cn.nomeatcoder.common.domain.OrderItem;
 import cn.nomeatcoder.common.domain.Product;
 import cn.nomeatcoder.common.query.ProductQuery;
 
@@ -17,5 +18,5 @@ public interface ProductMapper extends Mapper<ProductQuery, Product> {
 	int delete(ProductQuery query);
 	List<Product> selectByNameAndProductId(ProductQuery query);
 	List<Product> selectByNameAndCategoryIds(ProductQuery query);
-
+	void reduceStock(List<OrderItem> list);
 }

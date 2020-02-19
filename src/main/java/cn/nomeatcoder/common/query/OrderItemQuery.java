@@ -1,9 +1,10 @@
 package cn.nomeatcoder.common.query;
 
-import java.util.Date;
-
 import cn.nomeatcoder.common.QueryBase;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 
 
@@ -36,7 +37,7 @@ public class OrderItemQuery extends QueryBase {
     /**
     * 生成订单时的商品单价，单位是元,保留两位小数
     */
-	private Float currentUnitPrice;
+    private BigDecimal currentUnitPrice;
     /**
     * 商品数量
     */
@@ -44,7 +45,7 @@ public class OrderItemQuery extends QueryBase {
     /**
     * 商品总价,单位是元,保留两位小数
     */
-	private Float totalPrice;
+    private BigDecimal totalPrice;
 	private Date createTime;
 	private Date updateTime;
 }

@@ -18,4 +18,6 @@ public interface CartMapper extends Mapper<CartQuery, Cart> {
 	int checkedOrUncheckedProduct(@Param("userId") Integer userId,@Param("productId")Integer productId,@Param("checked") Integer checked);
 	int selectCartProductCheckedStatusByUserId(Integer userId);
 	int selectCartProductCount(@Param("userId") Integer userId);
+
+	void deleteBatch(List<Cart> list);
 }

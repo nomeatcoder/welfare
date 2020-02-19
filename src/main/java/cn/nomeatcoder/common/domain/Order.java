@@ -3,6 +3,7 @@ package cn.nomeatcoder.common.domain;
 import cn.nomeatcoder.common.Domain;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -31,7 +32,7 @@ public class Order implements Domain {
 	/**
 	 * 实际付款金额,单位是元,保留两位小数
 	 */
-	private Float payment;
+	private BigDecimal payment;
 	/**
 	 * 支付类型,1-在线支付
 	 */
