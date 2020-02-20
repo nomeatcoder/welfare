@@ -1,5 +1,6 @@
 package cn.nomeatcoder.common.query;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import cn.nomeatcoder.common.QueryBase;
@@ -41,6 +42,10 @@ public class UserQuery extends QueryBase {
     * 角色0-管理员,1-普通用户
     */
 	private Integer role;
+	/**
+	 * 积分
+	 */
+	private BigDecimal integral;
     /**
     * 创建时间
     */

@@ -1,11 +1,9 @@
 package cn.nomeatcoder.service.impl;
 
-import cn.nomeatcoder.common.CommonProperties;
-import cn.nomeatcoder.common.Const;
-import cn.nomeatcoder.common.ServerResponse;
-import cn.nomeatcoder.common.TokenCache;
+import cn.nomeatcoder.common.*;
 import cn.nomeatcoder.common.domain.User;
 import cn.nomeatcoder.common.query.UserQuery;
+import cn.nomeatcoder.common.vo.UserVo;
 import cn.nomeatcoder.dal.mapper.UserMapper;
 import cn.nomeatcoder.service.UserService;
 import cn.nomeatcoder.utils.MD5Utils;
@@ -14,7 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("userService")
@@ -199,5 +199,38 @@ public class UserServiceImpl implements UserService {
 			return ServerResponse.success();
 		}
 		return ServerResponse.error();
+	}
+
+	@Override
+	public ServerResponse list(int pageSize, int pageNum) {
+		return search(null, pageSize, pageNum);
+	}
+
+	@Override
+	public ServerResponse search(String username, int pageSize, int pageNum) {
+		UserQuery query = new UserQuery();
+		query.setPageSize(pageSize);
+		query.setCurrentPage(pageNum);
+		query.setUsername(username);
+		List<User> list = userMapper.find(query);
+		List<UserVo> userVoList = list.stream().map(
+			v -> {
+				UserVo userVo = new UserVo();
+				userVo.setId(v.getId());
+				userVo.setUsername(v.getUsername());
+				userVo.setEmail(v.getEmail());
+				userVo.setPhone(v.getPhone());
+				userVo.setQuestion(v.getQuestion());
+				userVo.setAnswer(v.getAnswer());
+				userVo.setRole(v.getRole() == 0 ? "管理员" : "普通用户");
+				userVo.setIntegral(v.getIntegral());
+				userVo.setCreateTime(Const.DF.format(v.getCreateTime()));
+				userVo.setUpdateTime((Const.DF.format(v.getUpdateTime())));
+				return userVo;
+			}
+		).collect(Collectors.toList());
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.init(userMapper.count(query), pageNum, pageSize, userVoList);
+		return ServerResponse.success(pageInfo);
 	}
 }

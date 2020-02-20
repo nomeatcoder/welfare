@@ -1,4 +1,4 @@
-package cn.nomeatcoder.common.domain;
+package cn.nomeatcoder.common.vo;
 
 import cn.nomeatcoder.common.Domain;
 import lombok.Data;
@@ -15,7 +15,7 @@ import java.util.Date;
  * @Date 2020-01-31 14:38:45
  */
 @Data
-public class User implements Domain {
+public class UserVo implements Domain {
 	/**
 	 * 用户表id
 	 */
@@ -24,10 +24,6 @@ public class User implements Domain {
 	 * 用户名
 	 */
 	private String username;
-	/**
-	 * 用户密码，MD5加密
-	 */
-	private String password;
 	private String email;
 	private String phone;
 	/**
@@ -41,7 +37,7 @@ public class User implements Domain {
 	/**
 	 * 角色0-管理员,1-普通用户
 	 */
-	private Integer role;
+	private String role;
 	/**
 	 * 积分
 	 */
@@ -49,9 +45,9 @@ public class User implements Domain {
 	/**
 	 * 创建时间
 	 */
-	private Date createTime;
+	private String createTime;
 	/**
 	 * 最后一次更新时间
 	 */
-	private Date updateTime;
+	private String updateTime;
 }

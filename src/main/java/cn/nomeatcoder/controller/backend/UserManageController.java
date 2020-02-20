@@ -1,13 +1,11 @@
 package cn.nomeatcoder.controller.backend;
 
 import cn.nomeatcoder.common.Const;
+import cn.nomeatcoder.common.ResponseCode;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.User;
 import cn.nomeatcoder.service.UserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -19,8 +17,7 @@ public class UserManageController {
 	@Resource
 	private UserService userService;
 
-
-	@PostMapping("login.do")
+	@RequestMapping("login.do")
 	@ResponseBody
 	public ServerResponse login(String username, String password, HttpSession session) {
 		ServerResponse response = userService.login(username, password);
@@ -35,6 +32,30 @@ public class UserManageController {
 			}
 		}
 		return response;
+	}
+
+	@RequestMapping("list.do")
+	@ResponseBody
+	public ServerResponse userList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
+	                                @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
+		}
+		return userService.list(pageSize,pageNum);
+	}
+
+	@RequestMapping("search.do")
+	@ResponseBody
+	public ServerResponse search(HttpSession session,
+	                             @RequestParam(value = "username")String username,
+	                             @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
+	                               @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
+		}
+		return userService.search(username,pageSize,pageNum);
 	}
 
 }

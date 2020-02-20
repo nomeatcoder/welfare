@@ -13,13 +13,14 @@
         <result property="question" column="question"/>
         <result property="answer" column="answer"/>
         <result property="role" column="role"/>
+        <result property="integral" column="integral"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <!-- 数据库字段 -->
     <sql id="columns">
-        id, username, password, email, phone, question, answer, role, create_time, update_time
+        id, username, password, email, phone, question, answer, role, integral, create_time, update_time
     </sql>
 
     <sql id="table">
@@ -120,7 +121,9 @@
             <if test="role != null">
                 role,
             </if>
-
+            <if test="integral != null">
+                integral,
+            </if>
             create_time,
 
             update_time,
@@ -150,6 +153,9 @@
             </if>
             <if test="role != null">
                 #{role, jdbcType=INTEGER},
+            </if>
+            <if test="integral != null">
+                #{integral, jdbcType=DECIMAL},
             </if>
             now(),
             now(),
@@ -181,6 +187,9 @@
             </if>
             <if test="role != null">
                 role = #{role, jdbcType=INTEGER},
+            </if>
+            <if test="integral != null">
+                role = #{integral, jdbcType=DECIMAL},
             </if>
             update_time = now()
         </set>

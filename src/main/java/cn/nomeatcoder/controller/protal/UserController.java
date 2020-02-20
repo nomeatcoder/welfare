@@ -20,7 +20,7 @@ public class UserController {
 	@Resource
 	private UserService userService;
 
-	@PostMapping("login.do")
+	@RequestMapping("login.do")
 	public ServerResponse login(String username, String password, HttpSession session) {
 		Assert.hasText(username, "username is invalid");
 		Assert.hasText(password, "password is invalid");
@@ -32,23 +32,23 @@ public class UserController {
 		return response;
 	}
 
-	@PostMapping("logout.do")
+	@RequestMapping("logout.do")
 	public ServerResponse logout(HttpSession session) {
 		session.removeAttribute(Const.CURRENT_USER);
 		return ServerResponse.success();
 	}
 
-	@PostMapping("register.do")
+	@RequestMapping("register.do")
 	public ServerResponse register(User user) {
 		return userService.register(user);
 	}
 
-	@PostMapping("check_valid.do")
+	@RequestMapping("check_valid.do")
 	public ServerResponse checkValid(String str, String type) {
 		return userService.checkValid(str, type);
 	}
 
-	@PostMapping("get_user_info.do")
+	@RequestMapping("get_user_info.do")
 	public ServerResponse getUserInfo(HttpSession session) {
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
 		if (user != null) {
@@ -57,22 +57,22 @@ public class UserController {
 		return ServerResponse.error("用户未登录,无法获取当前用户的信息");
 	}
 
-	@PostMapping("forget_get_question.do")
+	@RequestMapping("forget_get_question.do")
 	public ServerResponse forgetGetQuestion(String username) {
 		return userService.selectQuestion(username);
 	}
 
-	@PostMapping("forget_check_answer.do")
+	@RequestMapping("forget_check_answer.do")
 	public ServerResponse forgetCheckAnswer(String username, String question, String answer) {
 		return userService.checkAnswer(username, question, answer);
 	}
 
-	@PostMapping("forget_reset_password.do")
+	@RequestMapping("forget_reset_password.do")
 	public ServerResponse forgetRestPassword(String username, String passwordNew, String forgetToken) {
 		return userService.forgetResetPassword(username, passwordNew, forgetToken);
 	}
 
-	@PostMapping("reset_password.do")
+	@RequestMapping("reset_password.do")
 	public ServerResponse resetPassword(HttpSession session, String passwordOld, String passwordNew) {
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
 		if (user == null) {
@@ -82,7 +82,7 @@ public class UserController {
 	}
 
 
-	@PostMapping("update_information.do")
+	@RequestMapping("update_information.do")
 	public ServerResponse update_information(HttpSession session, User user) {
 		User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
 		if (currentUser == null) {
@@ -101,7 +101,7 @@ public class UserController {
 		return response;
 	}
 
-	@PostMapping("get_information.do")
+	@RequestMapping("get_information.do")
 	public ServerResponse get_information(HttpSession session) {
 		User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
 		if (currentUser == null) {
@@ -109,5 +109,4 @@ public class UserController {
 		}
 		return userService.getInformation(currentUser.getId());
 	}
-
 }

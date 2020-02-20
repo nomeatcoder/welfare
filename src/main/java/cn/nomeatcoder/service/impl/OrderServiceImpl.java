@@ -28,6 +28,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -74,6 +75,7 @@ public class OrderServiceImpl implements OrderService {
 		tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ServerResponse createOrder(Integer userId, Integer shippingId) {
 
@@ -217,8 +219,7 @@ public class OrderServiceImpl implements OrderService {
 
 		order.setUserId(userId);
 		order.setShippingId(shippingId);
-		//发货时间等等
-		//付款时间等等
+
 		long rowCount = orderMapper.insert(order);
 		if (rowCount > 0) {
 			return order;
@@ -359,6 +360,38 @@ public class OrderServiceImpl implements OrderService {
 		return ServerResponse.success(pageResult);
 	}
 
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public ServerResponse aliCallback(Map<String, String> params) throws ParseException {
+		Long orderNo = Long.parseLong(params.get("out_trade_no"));
+		String tradeNo = params.get("trade_no");
+		String tradeStatus = params.get("trade_status");
+		OrderQuery query = new OrderQuery();
+		query.setOrderNo(orderNo);
+		Order order = orderMapper.get(query);
+		if (order == null) {
+			return ServerResponse.error("非福利商城的订单,回调忽略");
+		}
+		if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()) {
+			return ServerResponse.success("支付宝重复调用");
+		}
+		if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)) {
+			order.setPaymentTime(Const.DF.parse(params.get("gmt_payment")));
+			order.setStatus(Const.OrderStatusEnum.PAID.getCode());
+			orderMapper.update(order);
+		}
+
+		PayInfo payInfo = new PayInfo();
+		payInfo.setUserId(order.getUserId());
+		payInfo.setOrderNo(order.getOrderNo());
+		payInfo.setPayPlatform(Const.PayPlatformEnum.ALIPAY.getCode());
+		payInfo.setPlatformNumber(tradeNo);
+		payInfo.setPlatformStatus(tradeStatus);
+
+		payInfoMapper.insert(payInfo);
+
+		return ServerResponse.success();
+	}
 
 	private List<OrderVo> assembleOrderVoList(List<Order> orderList, Integer userId) {
 		List<OrderVo> orderVoList = Lists.newArrayList();
@@ -487,38 +520,6 @@ public class OrderServiceImpl implements OrderService {
 				return ServerResponse.error("不支持的交易状态，交易返回异常!!!");
 		}
 
-	}
-
-	@Override
-	public ServerResponse aliCallback(Map<String, String> params) throws ParseException {
-		Long orderNo = Long.parseLong(params.get("out_trade_no"));
-		String tradeNo = params.get("trade_no");
-		String tradeStatus = params.get("trade_status");
-		OrderQuery query = new OrderQuery();
-		query.setOrderNo(orderNo);
-		Order order = orderMapper.get(query);
-		if (order == null) {
-			return ServerResponse.error("非福利商城的订单,回调忽略");
-		}
-		if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()) {
-			return ServerResponse.success("支付宝重复调用");
-		}
-		if (Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)) {
-			order.setPaymentTime(Const.DF.parse(params.get("gmt_payment")));
-			order.setStatus(Const.OrderStatusEnum.PAID.getCode());
-			orderMapper.update(order);
-		}
-
-		PayInfo payInfo = new PayInfo();
-		payInfo.setUserId(order.getUserId());
-		payInfo.setOrderNo(order.getOrderNo());
-		payInfo.setPayPlatform(Const.PayPlatformEnum.ALIPAY.getCode());
-		payInfo.setPlatformNumber(tradeNo);
-		payInfo.setPlatformStatus(tradeStatus);
-
-		payInfoMapper.insert(payInfo);
-
-		return ServerResponse.success();
 	}
 
 	@Override
