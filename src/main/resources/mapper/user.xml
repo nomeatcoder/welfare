@@ -189,7 +189,7 @@
                 role = #{role, jdbcType=INTEGER},
             </if>
             <if test="integral != null">
-                role = #{integral, jdbcType=DECIMAL},
+                integral = #{integral, jdbcType=DECIMAL},
             </if>
             update_time = now()
         </set>

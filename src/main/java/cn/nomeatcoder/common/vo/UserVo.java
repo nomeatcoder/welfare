@@ -41,7 +41,7 @@ public class UserVo implements Domain {
 	/**
 	 * 积分
 	 */
-	private BigDecimal integral;
+	private String integral;
 	/**
 	 * 创建时间
 	 */

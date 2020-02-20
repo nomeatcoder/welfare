@@ -154,13 +154,13 @@ public class CartServiceImpl implements CartService {
 					}
 					cartProductVo.setQuantity(buyLimitCount);
 					//计算总价
-					cartProductVo.setProductTotalPrice(BigDecimalUtils.mul(product.getPrice().doubleValue(), cartProductVo.getQuantity()));
+					cartProductVo.setProductTotalPrice(BigDecimalUtils.mul(product.getPrice(), new BigDecimal(cartProductVo.getQuantity())));
 					cartProductVo.setProductChecked(cartItem.getChecked());
 				}
 
 				if (cartItem.getChecked() == Const.Cart.CHECKED) {
 					//如果已经勾选,增加到整个的购物车总价中
-					cartTotalPrice = BigDecimalUtils.add(cartTotalPrice.doubleValue(), cartProductVo.getProductTotalPrice().doubleValue());
+					cartTotalPrice = BigDecimalUtils.add(cartTotalPrice, cartProductVo.getProductTotalPrice());
 				}
 				cartProductVoList.add(cartProductVo);
 			}

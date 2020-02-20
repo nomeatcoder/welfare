@@ -28,4 +28,6 @@ public interface UserService {
 	ServerResponse list(int pageSize, int pageNum);
 
 	ServerResponse search(String username, int pageSize, int pageNum);
+
+	ServerResponse charge(int id, String integral);
 }

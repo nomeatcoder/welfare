@@ -237,7 +237,7 @@ public class OrderServiceImpl implements OrderService {
 	private BigDecimal getOrderTotalPrice(List<OrderItem> orderItemList) {
 		BigDecimal payment = new BigDecimal("0");
 		for (OrderItem orderItem : orderItemList) {
-			payment = BigDecimalUtils.add(payment.doubleValue(), orderItem.getTotalPrice().doubleValue());
+			payment = BigDecimalUtils.add(payment, orderItem.getTotalPrice());
 		}
 		return payment;
 	}
@@ -269,7 +269,7 @@ public class OrderServiceImpl implements OrderService {
 			orderItem.setProductImage(product.getMainImage());
 			orderItem.setCurrentUnitPrice(product.getPrice());
 			orderItem.setQuantity(cartItem.getQuantity());
-			orderItem.setTotalPrice(BigDecimalUtils.mul(product.getPrice().doubleValue(), cartItem.getQuantity()));
+			orderItem.setTotalPrice(BigDecimalUtils.mul(product.getPrice(), new BigDecimal(cartItem.getQuantity())));
 			orderItemList.add(orderItem);
 		}
 		return ServerResponse.success(orderItemList);
@@ -319,7 +319,7 @@ public class OrderServiceImpl implements OrderService {
 
 		BigDecimal payment = new BigDecimal("0");
 		for (OrderItem orderItem : orderItemList) {
-			payment = BigDecimalUtils.add(payment.doubleValue(), orderItem.getTotalPrice().doubleValue());
+			payment = BigDecimalUtils.add(payment, orderItem.getTotalPrice());
 			orderItemVoList.add(assembleOrderItemVo(orderItem));
 		}
 		orderProductVo.setProductTotalPrice(payment);
@@ -462,7 +462,7 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderItem> orderItemList = orderItemMapper.find(orderItemQuery);
 		for (OrderItem orderItem : orderItemList) {
 			GoodsDetail goods = GoodsDetail.newInstance(orderItem.getProductId().toString(), orderItem.getProductName(),
-				BigDecimalUtils.mul(orderItem.getCurrentUnitPrice().doubleValue(), new Double(100).doubleValue()).longValue(),
+				BigDecimalUtils.mul(orderItem.getCurrentUnitPrice(), new BigDecimal("100")).longValue(),
 				orderItem.getQuantity());
 			goodsDetailList.add(goods);
 		}

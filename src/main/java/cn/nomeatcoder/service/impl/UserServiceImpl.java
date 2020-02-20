@@ -6,12 +6,14 @@ import cn.nomeatcoder.common.query.UserQuery;
 import cn.nomeatcoder.common.vo.UserVo;
 import cn.nomeatcoder.dal.mapper.UserMapper;
 import cn.nomeatcoder.service.UserService;
+import cn.nomeatcoder.utils.BigDecimalUtils;
 import cn.nomeatcoder.utils.MD5Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -222,8 +224,8 @@ public class UserServiceImpl implements UserService {
 				userVo.setPhone(v.getPhone());
 				userVo.setQuestion(v.getQuestion());
 				userVo.setAnswer(v.getAnswer());
-				userVo.setRole(v.getRole() == 0 ? "管理员" : "普通用户");
-				userVo.setIntegral(v.getIntegral());
+				userVo.setRole(v.getRole() == 1 ? "管理员" : "普通用户");
+				userVo.setIntegral(v.getIntegral().toString());
 				userVo.setCreateTime(Const.DF.format(v.getCreateTime()));
 				userVo.setUpdateTime((Const.DF.format(v.getUpdateTime())));
 				return userVo;
@@ -232,5 +234,21 @@ public class UserServiceImpl implements UserService {
 		PageInfo pageInfo = new PageInfo();
 		pageInfo.init(userMapper.count(query), pageNum, pageSize, userVoList);
 		return ServerResponse.success(pageInfo);
+	}
+
+	@Override
+	public ServerResponse charge(int id, String integral) {
+		UserQuery query = new UserQuery();
+		query.setId(id);
+		User user = userMapper.get(query);
+		if(user == null){
+			return ServerResponse.error("用户不存在");
+		}
+		user.setIntegral(BigDecimalUtils.add(user.getIntegral(), new BigDecimal(integral)));
+		int rowCount = userMapper.update(user);
+		if (rowCount > 0) {
+			return ServerResponse.success("充值成功");
+		}
+		return ServerResponse.error("充值失败");
 	}
 }
