@@ -18,4 +18,5 @@ public class StaticTest {
 			System.out.println("NO MATCH");
 		}
 	}
+	
 }

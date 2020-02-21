@@ -1,9 +1,13 @@
 package cn.nomeatcoder.service.impl;
 
 import cn.nomeatcoder.common.*;
+import cn.nomeatcoder.common.domain.IntegralDetail;
 import cn.nomeatcoder.common.domain.User;
+import cn.nomeatcoder.common.query.IntegralDetailQuery;
 import cn.nomeatcoder.common.query.UserQuery;
+import cn.nomeatcoder.common.vo.IntegralDetailVo;
 import cn.nomeatcoder.common.vo.UserVo;
+import cn.nomeatcoder.dal.mapper.IntegralDetailMapper;
 import cn.nomeatcoder.dal.mapper.UserMapper;
 import cn.nomeatcoder.service.UserService;
 import cn.nomeatcoder.utils.BigDecimalUtils;
@@ -11,6 +15,7 @@ import cn.nomeatcoder.utils.MD5Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -27,6 +32,9 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	private CommonProperties commonProperties;
+
+	@Resource
+	private IntegralDetailMapper integralDetailMapper;
 
 	@Override
 	public ServerResponse login(String username, String password) {
@@ -236,6 +244,7 @@ public class UserServiceImpl implements UserService {
 		return ServerResponse.success(pageInfo);
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ServerResponse charge(int id, String integral) {
 		UserQuery query = new UserQuery();
@@ -244,11 +253,63 @@ public class UserServiceImpl implements UserService {
 		if(user == null){
 			return ServerResponse.error("用户不存在");
 		}
-		user.setIntegral(BigDecimalUtils.add(user.getIntegral(), new BigDecimal(integral)));
+		BigDecimal remainIntegral = BigDecimalUtils.add(user.getIntegral(), new BigDecimal(integral));
+		user.setIntegral(remainIntegral);
 		int rowCount = userMapper.update(user);
 		if (rowCount > 0) {
-			return ServerResponse.success("充值成功");
+			ServerResponse serverResponse = insertIntegralDetail(user, 0, new BigDecimal(integral), remainIntegral);
+			if (serverResponse.isSuccess()) {
+				return ServerResponse.success("充值成功");
+			}
+			throw new RuntimeException("插入积分详情失败");
 		}
 		return ServerResponse.error("充值失败");
+	}
+
+	@Override
+	public ServerResponse insertIntegralDetail(User user, int type, BigDecimal integral, BigDecimal remainIntegral) {
+		IntegralDetail integralDetail = new IntegralDetail();
+		integralDetail.setUserId(user.getId());
+		integralDetail.setUsername(user.getUsername());
+		integralDetail.setType(type);
+		integralDetail.setNum(integral);
+		integralDetail.setRemainIntegral(remainIntegral);
+		long rowCount = integralDetailMapper.insert(integralDetail);
+		if (rowCount > 0) {
+			return ServerResponse.success();
+		}
+		return ServerResponse.error();
+	}
+
+	@Override
+	public ServerResponse integralList(int pageSize, int pageNum) {
+		return integralSearch(null, pageSize, pageNum);
+	}
+
+	@Override
+	public ServerResponse integralSearch(String username, int pageSize, int pageNum) {
+		IntegralDetailQuery query = new IntegralDetailQuery();
+		query.setPageSize(pageSize);
+		query.setCurrentPage(pageNum);
+		query.setUsername(username);
+		query.putOrderBy("id", false);
+		query.setOrderByEnable(true);
+		List<IntegralDetail> list = integralDetailMapper.find(query);
+		List<IntegralDetailVo> integralDetailVoList = list.stream().map(
+			v -> {
+				IntegralDetailVo integralDetailVo = new IntegralDetailVo();
+				integralDetailVo.setId(v.getId());
+				integralDetailVo.setUsername(v.getUsername());
+				integralDetailVo.setType(v.getType() == 0 ? "积分充值" : "购物抵扣");
+				integralDetailVo.setAdd(v.getType() == 0 ? true : false);
+				integralDetailVo.setNum(v.getType() == 0 ? ("+" + v.getNum().toString()) : ("-" + v.getNum().toString()));
+				integralDetailVo.setRemainIntegral(v.getRemainIntegral().toString());
+				integralDetailVo.setCreateTime(Const.DF.format(v.getCreateTime()));
+				return integralDetailVo;
+			}
+		).collect(Collectors.toList());
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.init(integralDetailMapper.count(query), pageNum, pageSize, integralDetailVoList);
+		return ServerResponse.success(pageInfo);
 	}
 }

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.nomeatcoder.dal.mapper.IntegralDetailMapper">
+
+    <!-- 结果集对应关系 -->
+    <resultMap id="result" type="cn.nomeatcoder.common.domain.IntegralDetail" >
+        <id column="id" property="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="type" column="type"/>
+        <result property="num" column="num"/>
+        <result property="remainIntegral" column="remain_integral"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 数据库字段 -->
+    <sql id="columns">
+        id, user_id, username, `type`, num, remain_integral, create_time, update_time
+    </sql>
+
+    <sql id="table">
+        integral_detail
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="conditions">
+        <where>
+            <choose>
+                <when test="id != null">and id = #{id}</when>
+                <otherwise>
+                    <if test="userId != null">and user_id = #{userId}</if>
+                    <if test="username != null">and username = #{username}</if>
+                    <if test="type != null">and `type` = #{type}</if>
+                    <if test="num != null">and num = #{num}</if>
+                    <if test="remainIntegral != null">and remain_integral = #{remainIntegral}</if>
+                    <if test="createTime != null">and create_time = #{createTime}</if>
+                    <if test="updateTime != null">and update_time = #{updateTime}</if>
+                </otherwise>
+            </choose>
+        </where>
+    </sql>
+
+
+    <!-- 查询结果集 -->
+    <select id="find" resultMap="result"
+            parameterType="cn.nomeatcoder.common.query.IntegralDetailQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        <if test="orderByEnable and orderByList != null and orderByList.size() > 0">
+            order by
+            <foreach collection="orderByList" item="orderBy" separator=",">
+                ${orderBy.column} ${orderBy.sort}
+            </foreach>
+        </if>
+        <if test="pageEnable">
+            limit #{startRow}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 查询某条记录 -->
+    <select id="get" resultMap="result" parameterType="cn.nomeatcoder.common.query.IntegralDetailQuery">
+        select
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        <include refid="conditions"/>
+        limit 1
+    </select>
+
+    <!-- 统计查询结果数量 -->
+    <select id="count" resultType="long" parameterType="cn.nomeatcoder.common.query.IntegralDetailQuery">
+        select count(*) from
+        <include refid="table"/>
+        <include refid="conditions"/>
+    </select>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="cn.nomeatcoder.common.query.IntegralDetailQuery">
+        delete from
+        <include refid="table"/>
+        where id = #{id}
+    </delete>
+
+    <!-- 插入 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id"
+            parameterType="cn.nomeatcoder.common.domain.IntegralDetail">
+        insert into
+        <include refid="table"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="num != null">
+                num,
+            </if>
+            <if test="remainIntegral != null">
+                remain_integral,
+            </if>
+                create_time,
+                update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id, jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId, jdbcType=INTEGER},
+            </if>
+            <if test="username != null">
+                #{username, jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type, jdbcType=INTEGER},
+            </if>
+            <if test="num != null">
+                #{num, jdbcType=DECIMAL},
+            </if>
+            <if test="remainIntegral != null">
+                #{remainIntegral, jdbcType=DECIMAL},
+            </if>
+            now(),
+            now(),
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="cn.nomeatcoder.common.domain.IntegralDetail">
+        UPDATE
+        <include refid="table"/>
+        <set>
+            <if test="userId != null">
+                user_id = #{userId, jdbcType=INTEGER},
+            </if>
+            <if test="username != null">
+                username = #{username, jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                `type` = #{type, jdbcType=INTEGER},
+            </if>
+            <if test="num != null">
+                num = #{num, jdbcType=DECIMAL},
+            </if>
+            <if test="remainIntegral != null">
+                remain_integral = #{remainIntegral, jdbcType=DECIMAL},
+            </if>
+                update_time = now()
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+</mapper>

@@ -6,11 +6,13 @@ import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.User;
 import cn.nomeatcoder.service.UserService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("manage/user")
@@ -78,6 +80,31 @@ public class UserManageController {
 			return ServerResponse.error("请输入正确的积分格式");
 		}
 		return userService.charge(id,integral);
+	}
+
+	@RequestMapping("integral_list.do")
+	@ResponseBody
+	public ServerResponse integralList(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+	                                   @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
+		}
+		String username = user.getRole() == Const.Role.ROLE_ADMIN ? null : user.getUsername();
+		return userService.integralSearch(username, pageSize, pageNum);
+	}
+
+	@RequestMapping("integral_search.do")
+	@ResponseBody
+	public ServerResponse integralSearch(HttpSession session,
+	                                     @RequestParam("username") String username,
+	                                     @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+	                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
+		}
+		return userService.integralSearch(username, pageSize, pageNum);
 	}
 
 }

@@ -1,5 +1,6 @@
 package cn.nomeatcoder.service.impl;
 
+import cn.nomeatcoder.common.Const;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.Category;
 import cn.nomeatcoder.common.query.CategoryQuery;
@@ -62,6 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
 				indexVo.getList().add(categoryDetailVo);
 			}
 		}
+		indexVo.setImageHost(Const.IMAGE_HOST);
 		return ServerResponse.success(indexVo);
 	}
 

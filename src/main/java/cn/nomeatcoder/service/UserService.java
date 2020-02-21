@@ -3,6 +3,8 @@ package cn.nomeatcoder.service;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.User;
 
+import java.math.BigDecimal;
+
 public interface UserService {
 
 	ServerResponse login(String username, String password);
@@ -30,4 +32,10 @@ public interface UserService {
 	ServerResponse search(String username, int pageSize, int pageNum);
 
 	ServerResponse charge(int id, String integral);
+
+	ServerResponse insertIntegralDetail(User user, int type, BigDecimal integral, BigDecimal remainIntegral);
+
+	ServerResponse integralList(int pageSize, int pageNum);
+
+	ServerResponse integralSearch(String username, int pageSize, int pageNum);
 }
