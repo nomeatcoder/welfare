@@ -9,6 +9,8 @@ import java.util.List;
 public class OrderVo {
 
 	private Long orderNo;
+	private BigDecimal useIntegral;
+	private BigDecimal remain;
 	private BigDecimal payment;
 	private Integer paymentType;
 	private String paymentTypeDesc;

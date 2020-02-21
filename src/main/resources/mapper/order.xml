@@ -9,6 +9,7 @@
         <result property="orderNo" column="order_no"/>
         <result property="userId" column="user_id"/>
         <result property="shippingId" column="shipping_id"/>
+        <result property="useIntegral" column="use_integral"/>
         <result property="payment" column="payment"/>
         <result property="paymentType" column="payment_type"/>
         <result property="postage" column="postage"/>
@@ -23,7 +24,7 @@
 
     <!-- 数据库字段 -->
     <sql id="columns">
-        id, order_no, user_id, shipping_id, payment, payment_type, postage, status, payment_time, send_time, end_time, close_time, create_time, update_time
+        id, order_no, user_id, shipping_id, use_integral, payment, payment_type, postage, status, payment_time, send_time, end_time, close_time, create_time, update_time
     </sql>
 
     <sql id="table">
@@ -39,6 +40,7 @@
                     <if test="orderNo != null">and order_no = #{orderNo}</if>
                     <if test="userId != null">and user_id = #{userId}</if>
                     <if test="shippingId != null">and shipping_id = #{shippingId}</if>
+                    <if test="useIntegral != null">and use_integral = #{useIntegral}</if>
                     <if test="payment != null">and payment = #{payment}</if>
                     <if test="paymentType != null">and payment_type = #{paymentType}</if>
                     <if test="postage != null">and postage = #{postage}</if>
@@ -116,6 +118,9 @@
             <if test="shippingId != null">
                 shipping_id,
             </if>
+            <if test="useIntegral != null">
+                use_integral,
+            </if>
             <if test="payment != null">
                 payment,
             </if>
@@ -159,6 +164,9 @@
             <if test="shippingId != null">
                 #{shippingId, jdbcType=INTEGER},
             </if>
+            <if test="useIntegral != null">
+                #{useIntegral, jdbcType=DECIMAL},
+            </if>
             <if test="payment != null">
                 #{payment, jdbcType=DECIMAL},
             </if>
@@ -201,6 +209,9 @@
             </if>
             <if test="shippingId != null">
                 shipping_id = #{shippingId, jdbcType=INTEGER},
+            </if>
+            <if test="useIntegral != null">
+                use_integral = #{useIntegral, jdbcType=DECIMAL},
             </if>
             <if test="payment != null">
                 payment = #{payment, jdbcType=DECIMAL},

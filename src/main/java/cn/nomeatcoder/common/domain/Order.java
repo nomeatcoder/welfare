@@ -30,6 +30,10 @@ public class Order implements Domain {
 	private Integer userId;
 	private Integer shippingId;
 	/**
+	 * 使用的积分
+	 */
+	private BigDecimal useIntegral;
+	/**
 	 * 实际付款金额,单位是元,保留两位小数
 	 */
 	private BigDecimal payment;

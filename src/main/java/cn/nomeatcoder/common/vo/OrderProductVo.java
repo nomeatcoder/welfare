@@ -9,5 +9,7 @@ import java.util.List;
 public class OrderProductVo {
     private List<OrderItemVo> orderItemVoList;
     private BigDecimal productTotalPrice;
+    private BigDecimal useIntegral;
+    private BigDecimal remain;
     private String imageHost;
 }

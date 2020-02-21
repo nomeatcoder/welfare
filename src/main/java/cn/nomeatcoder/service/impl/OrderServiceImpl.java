@@ -11,6 +11,7 @@ import cn.nomeatcoder.common.vo.OrderVo;
 import cn.nomeatcoder.common.vo.ShippingVo;
 import cn.nomeatcoder.dal.mapper.*;
 import cn.nomeatcoder.service.OrderService;
+import cn.nomeatcoder.service.UserService;
 import cn.nomeatcoder.utils.BigDecimalUtils;
 import cn.nomeatcoder.utils.FTPUtils;
 import com.alipay.api.AlipayResponse;
@@ -60,7 +61,13 @@ public class OrderServiceImpl implements OrderService {
 	@Resource
 	private ShippingMapper shippingMapper;
 
+	@Resource
+	private UserMapper userMapper;
+
 	private static AlipayTradeService tradeService;
+
+	@Resource
+	private UserService userService;
 
 	static {
 
@@ -92,9 +99,26 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
 		BigDecimal payment = this.getOrderTotalPrice(orderItemList);
 
-
+		//查询积分
+		UserQuery userQuery = new UserQuery();
+		userQuery.setId(userId);
+		User user = userMapper.get(userQuery);
+		BigDecimal integral = user.getIntegral();
+		BigDecimal useIntegral;
+		BigDecimal minPayment = new BigDecimal("0.01");
+		if (integral.doubleValue() >= payment.subtract(minPayment).doubleValue()) {
+			useIntegral = payment.subtract(minPayment);
+		} else {
+			useIntegral = integral;
+		}
+		user.setIntegral(integral.subtract(useIntegral));
+		int rowCount = userMapper.update(user);
+		if (rowCount <= 0) {
+			throw new RuntimeException("更新用户失败");
+		}
+		userService.insertIntegralDetail(user, 1, useIntegral, user.getIntegral());
 		//生成订单
-		Order order = this.assembleOrder(userId, shippingId, payment);
+		Order order = this.assembleOrder(userId, shippingId, payment, useIntegral);
 		if (order == null) {
 			return ServerResponse.error("生成订单错误");
 		}
@@ -104,6 +128,8 @@ public class OrderServiceImpl implements OrderService {
 		for (OrderItem orderItem : orderItemList) {
 			orderItem.setOrderNo(order.getOrderNo());
 		}
+
+
 		//mybatis 批量插入
 		orderItemMapper.batchInsert(orderItemList);
 
@@ -113,7 +139,6 @@ public class OrderServiceImpl implements OrderService {
 		this.cleanCart(cartList);
 
 		//返回给前端数据
-
 		OrderVo orderVo = assembleOrderVo(order, orderItemList);
 		return ServerResponse.success(orderVo);
 	}
@@ -122,7 +147,9 @@ public class OrderServiceImpl implements OrderService {
 	private OrderVo assembleOrderVo(Order order, List<OrderItem> orderItemList) {
 		OrderVo orderVo = new OrderVo();
 		orderVo.setOrderNo(order.getOrderNo());
+		orderVo.setUseIntegral(order.getUseIntegral());
 		orderVo.setPayment(order.getPayment());
+		orderVo.setRemain(order.getPayment().subtract(order.getUseIntegral()));
 		orderVo.setPaymentType(order.getPaymentType());
 		orderVo.setPaymentTypeDesc(Const.PaymentTypeEnum.codeOf(order.getPaymentType()).getValue());
 
@@ -208,7 +235,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 
-	private Order assembleOrder(Integer userId, Integer shippingId, BigDecimal payment) {
+	private Order assembleOrder(Integer userId, Integer shippingId, BigDecimal payment, BigDecimal useIntegral) {
 		Order order = new Order();
 		long orderNo = this.generateOrderNo();
 		order.setOrderNo(orderNo);
@@ -216,6 +243,7 @@ public class OrderServiceImpl implements OrderService {
 		order.setPostage(0);
 		order.setPaymentType(Const.PaymentTypeEnum.ONLINE_PAY.getCode());
 		order.setPayment(payment);
+		order.setUseIntegral(useIntegral);
 
 		order.setUserId(userId);
 		order.setShippingId(shippingId);
@@ -276,6 +304,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ServerResponse cancel(Integer userId, Long orderNo) {
 		OrderQuery query = new OrderQuery();
@@ -294,6 +323,16 @@ public class OrderServiceImpl implements OrderService {
 
 		int row = orderMapper.update(updateOrder);
 		if (row > 0) {
+			//退还积分
+			UserQuery userQuery = new UserQuery();
+			userQuery.setId(userId);
+			User user = userMapper.get(userQuery);
+			user.setIntegral(user.getIntegral().add(order.getUseIntegral()));
+			int rowCount = userMapper.update(user);
+			if (rowCount <= 0) {
+				throw new RuntimeException("更新失败");
+			}
+			userService.insertIntegralDetail(user, 2, order.getUseIntegral(), user.getIntegral());
 			return ServerResponse.success();
 		}
 		return ServerResponse.error();
@@ -325,6 +364,20 @@ public class OrderServiceImpl implements OrderService {
 		orderProductVo.setProductTotalPrice(payment);
 		orderProductVo.setOrderItemVoList(orderItemVoList);
 		orderProductVo.setImageHost(Const.IMAGE_HOST);
+		//查询积分
+		UserQuery userQuery = new UserQuery();
+		userQuery.setId(userId);
+		User user = userMapper.get(userQuery);
+		BigDecimal integral = user.getIntegral();
+		BigDecimal useIntegral = user.getIntegral();
+		BigDecimal minPayment = new BigDecimal("0.01");
+		if (integral.doubleValue() >= payment.subtract(minPayment).doubleValue()) {
+			useIntegral = payment.subtract(minPayment);
+		} else {
+			useIntegral = integral;
+		}
+		orderProductVo.setUseIntegral(useIntegral);
+		orderProductVo.setRemain(payment.subtract(useIntegral));
 		return ServerResponse.success(orderProductVo);
 	}
 
@@ -353,6 +406,8 @@ public class OrderServiceImpl implements OrderService {
 		query.setUserId(userId);
 		query.setPageSize(pageSize);
 		query.setCurrentPage(pageNum);
+		query.putOrderBy("id", false);
+		query.setOrderByEnable(true);
 		List<Order> orderList = orderMapper.find(query);
 		List<OrderVo> orderVoList = assembleOrderVoList(orderList, userId);
 		PageInfo pageResult = new PageInfo();
@@ -427,7 +482,7 @@ public class OrderServiceImpl implements OrderService {
 
 		// (必填) 订单总金额，单位为元，不能超过1亿元
 		// 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
-		String totalAmount = order.getPayment().toString();
+		String totalAmount = (order.getPayment().subtract(order.getUseIntegral())).toString();
 
 		// (可选) 订单不可打折金额，可以配合商家平台配置折扣活动，如果酒水不参与打折，则将对应金额填写至此字段
 		// 如果该值未传入,但传入了【订单总金额】,【打折金额】,则该值默认为【订单总金额】-【打折金额】

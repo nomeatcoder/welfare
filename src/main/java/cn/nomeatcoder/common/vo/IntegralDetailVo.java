@@ -21,7 +21,7 @@ public class IntegralDetailVo implements Domain {
 	*/
 	private String username;
 	/**
-	* 类型 0-充值 1-购物抵扣
+	* 类型 0-充值 1-购物抵扣 2-关单退回
 	*/
 	private String type;
 	private boolean add;

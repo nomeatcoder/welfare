@@ -300,9 +300,9 @@ public class UserServiceImpl implements UserService {
 				IntegralDetailVo integralDetailVo = new IntegralDetailVo();
 				integralDetailVo.setId(v.getId());
 				integralDetailVo.setUsername(v.getUsername());
-				integralDetailVo.setType(v.getType() == 0 ? "积分充值" : "购物抵扣");
-				integralDetailVo.setAdd(v.getType() == 0 ? true : false);
-				integralDetailVo.setNum(v.getType() == 0 ? ("+" + v.getNum().toString()) : ("-" + v.getNum().toString()));
+				integralDetailVo.setType(v.getType() == 0 ? "积分充值" : (v.getType() == 1 ? "购物抵扣" : "关单退回"));
+				integralDetailVo.setAdd(v.getType() == 1 ? false : true);
+				integralDetailVo.setNum(v.getType() == 1 ? ("-" + v.getNum().toString()) : ("+" + v.getNum().toString()));
 				integralDetailVo.setRemainIntegral(v.getRemainIntegral().toString());
 				integralDetailVo.setCreateTime(Const.DF.format(v.getCreateTime()));
 				return integralDetailVo;
