@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -25,6 +26,9 @@ public class AppTest {
 	@Resource
 	private UserMapper userMapper;
 
+	@Resource
+	private StringRedisTemplate stringRedisTemplate;
+
 	@Test
 	public void test() {
 		System.out.println("success");
@@ -38,6 +42,14 @@ public class AppTest {
 		query.setPageSize(2L);
 		System.out.println(userMapper.find(query));
 	}
+
+	@Test
+	public void testRedis(){
+		System.out.println(stringRedisTemplate);
+		stringRedisTemplate.opsForValue().set("test","test");
+		System.out.println(stringRedisTemplate.opsForValue().get("test"));
+	}
+
 	@SpringBootApplication
 	public static class Config{
 

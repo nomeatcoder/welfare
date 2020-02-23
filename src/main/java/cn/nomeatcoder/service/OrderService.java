@@ -16,6 +16,8 @@ public interface OrderService {
 
 	ServerResponse cancel(Integer userId, Long orderNo);
 
+	ServerResponse del(Integer userId, Long orderNo);
+
 	ServerResponse getOrderCartProduct(Integer userId);
 
 	ServerResponse getOrderDetail(Integer userId, Long orderNo);
@@ -29,4 +31,5 @@ public interface OrderService {
 	ServerResponse manageSearch(Long orderNo, int pageNum, int pageSize);
 
 	ServerResponse manageSendGoods(Long orderNo);
+
 }

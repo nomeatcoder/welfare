@@ -338,6 +338,22 @@ public class OrderServiceImpl implements OrderService {
 		return ServerResponse.error();
 	}
 
+	@Override
+	public ServerResponse del(Integer userId, Long orderNo) {
+		OrderQuery query = new OrderQuery();
+		query.setUserId(userId);
+		query.setOrderNo(orderNo);
+		Order order = orderMapper.get(query);
+		if (order == null) {
+			return ServerResponse.error("该用户此订单不存在");
+		}
+		int rowCount = orderMapper.delete(order);
+		if (rowCount > 0) {
+			return ServerResponse.success("删除成功");
+		}
+		return ServerResponse.error("删除失败");
+	}
+
 
 	@Override
 	public ServerResponse getOrderCartProduct(Integer userId) {

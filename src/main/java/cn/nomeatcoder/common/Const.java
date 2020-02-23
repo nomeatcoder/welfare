@@ -19,7 +19,7 @@ public class Const {
 	//线上域名需要备案,所以本机用内网穿透验证,线上不验证
 	public static final String ALIPAY_CALLBACK_URL = "http://dfuyyu.natappfree.cc/order/alipay_callback.do";
 	public static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+	public static final int SESSION_EXPIRE_TIME = 60 * 30;
 	public interface ProductListOrderBy{
 		Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_desc","price_asc");
 	}
@@ -86,7 +86,7 @@ public class Const {
 					return orderStatusEnum;
 				}
 			}
-			throw new RuntimeException("么有找到对应的枚举");
+			throw new RuntimeException("没有找到对应的枚举");
 		}
 	}
 	public interface  AlipayCallback{
@@ -143,7 +143,7 @@ public class Const {
 					return paymentTypeEnum;
 				}
 			}
-			throw new RuntimeException("么有找到对应的枚举");
+			throw new RuntimeException("没有找到对应的枚举");
 		}
 
 	}

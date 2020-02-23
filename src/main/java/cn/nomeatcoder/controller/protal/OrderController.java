@@ -52,6 +52,16 @@ public class OrderController {
 		return orderService.cancel(user.getId(),orderNo);
 	}
 
+	@RequestMapping("del.do")
+	@ResponseBody
+	public ServerResponse del(HttpSession session, Long orderNo){
+		User user = (User)session.getAttribute(Const.CURRENT_USER);
+		if(user ==null){
+			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+		}
+		return orderService.del(user.getId(),orderNo);
+	}
+
 
 	@RequestMapping("get_order_cart_product.do")
 	@ResponseBody

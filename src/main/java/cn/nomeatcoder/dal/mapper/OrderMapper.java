@@ -12,4 +12,5 @@ import cn.nomeatcoder.common.query.OrderQuery;
  * @Date 2020-01-31 14:38:45
  */
 public interface OrderMapper extends Mapper<OrderQuery, Order> {
+	int delete(Order order);
 }
