@@ -12,6 +12,8 @@ public enum ResponseCode {
 
 	NEED_LOGIN(10, "NEED_LOGIN"),
 
+	SERVER_ERROR(5, "SERVER_ERROR"),
+
 	ILLEGAL_ARGUMENT(2, "ILLEGAL_ARGUMENT");
 
 	private Integer code;

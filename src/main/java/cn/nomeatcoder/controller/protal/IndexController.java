@@ -22,4 +22,5 @@ public class IndexController {
 	public ServerResponse getIndexInfo(){
 		return categoryService.getIndex();
 	}
+
 }

@@ -4,6 +4,7 @@ import cn.nomeatcoder.common.Const;
 import cn.nomeatcoder.common.PageInfo;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.*;
+import cn.nomeatcoder.common.error.BizException;
 import cn.nomeatcoder.common.query.*;
 import cn.nomeatcoder.common.vo.OrderItemVo;
 import cn.nomeatcoder.common.vo.OrderProductVo;
@@ -114,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
 		user.setIntegral(integral.subtract(useIntegral));
 		int rowCount = userMapper.update(user);
 		if (rowCount <= 0) {
-			throw new RuntimeException("更新用户失败");
+			throw new BizException("更新用户失败");
 		}
 		userService.insertIntegralDetail(user, 1, useIntegral, user.getIntegral());
 		//生成订单
@@ -330,7 +331,7 @@ public class OrderServiceImpl implements OrderService {
 			user.setIntegral(user.getIntegral().add(order.getUseIntegral()));
 			int rowCount = userMapper.update(user);
 			if (rowCount <= 0) {
-				throw new RuntimeException("更新失败");
+				throw new BizException("更新积分失败");
 			}
 			userService.insertIntegralDetail(user, 2, order.getUseIntegral(), user.getIntegral());
 			return ServerResponse.success();

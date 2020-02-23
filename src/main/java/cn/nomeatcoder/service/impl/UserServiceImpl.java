@@ -3,6 +3,7 @@ package cn.nomeatcoder.service.impl;
 import cn.nomeatcoder.common.*;
 import cn.nomeatcoder.common.domain.IntegralDetail;
 import cn.nomeatcoder.common.domain.User;
+import cn.nomeatcoder.common.error.BizException;
 import cn.nomeatcoder.common.query.IntegralDetailQuery;
 import cn.nomeatcoder.common.query.UserQuery;
 import cn.nomeatcoder.common.vo.IntegralDetailVo;
@@ -261,7 +262,7 @@ public class UserServiceImpl implements UserService {
 			if (serverResponse.isSuccess()) {
 				return ServerResponse.success("充值成功");
 			}
-			throw new RuntimeException("插入积分详情失败");
+			throw new BizException("插入积分详情失败");
 		}
 		return ServerResponse.error("充值失败");
 	}

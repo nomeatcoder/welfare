@@ -1,4 +1,6 @@
 package cn.nomeatcoder.common;
 
-public interface Domain {
+import java.io.Serializable;
+
+public interface Domain extends Serializable {
 }

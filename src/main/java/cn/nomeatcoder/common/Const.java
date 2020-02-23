@@ -1,5 +1,6 @@
 package cn.nomeatcoder.common;
 
+import cn.nomeatcoder.common.error.BizException;
 import com.google.common.collect.Sets;
 
 import java.text.SimpleDateFormat;
@@ -86,7 +87,7 @@ public class Const {
 					return orderStatusEnum;
 				}
 			}
-			throw new RuntimeException("没有找到对应的枚举");
+			throw new BizException("没有找到对应的枚举");
 		}
 	}
 	public interface  AlipayCallback{
@@ -143,12 +144,9 @@ public class Const {
 					return paymentTypeEnum;
 				}
 			}
-			throw new RuntimeException("没有找到对应的枚举");
+			throw new BizException("没有找到对应的枚举");
 		}
 
 	}
-
-
-
 
 }
