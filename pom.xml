@@ -144,7 +144,27 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
-
+        <!-- alipay本地依赖 -->
+        <dependency>
+            <groupId>cn.nomeatcoder</groupId>
+            <artifactId>alipay-sdk</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.nomeatcoder</groupId>
+            <artifactId>alipay-sdk-source</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.nomeatcoder</groupId>
+            <artifactId>alipay-trade-sdk</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.nomeatcoder</groupId>
+            <artifactId>alipay-trade-sdk-source</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -191,5 +211,12 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <finalName>welfare</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 </project>
