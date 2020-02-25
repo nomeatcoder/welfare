@@ -1,6 +1,7 @@
 package cn.nomeatcoder.controller.backend;
 
 import cn.nomeatcoder.common.Const;
+import cn.nomeatcoder.common.IgnoreLogin;
 import cn.nomeatcoder.common.ResponseCode;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.User;
@@ -21,6 +22,7 @@ public class UserManageController {
 	@Resource
 	private UserService userService;
 
+	@IgnoreLogin
 	@RequestMapping("login.do")
 	@ResponseBody
 	public ServerResponse login(String username, String password, HttpSession session) {
@@ -42,10 +44,6 @@ public class UserManageController {
 	@ResponseBody
 	public ServerResponse userList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
 	                                @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null) {
-			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
-		}
 		return userService.list(pageSize,pageNum);
 	}
 
@@ -55,10 +53,6 @@ public class UserManageController {
 	                             @RequestParam(value = "username")String username,
 	                             @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
 	                               @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null) {
-			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
-		}
 		return userService.search(username,pageSize,pageNum);
 	}
 
@@ -67,10 +61,6 @@ public class UserManageController {
 	public ServerResponse search(HttpSession session,
 	                             @RequestParam(value = "id",defaultValue = "0")int id,
 	                             @RequestParam(value = "integral",defaultValue = "0") String integral){
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null) {
-			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
-		}
 		if(StringUtils.isBlank(integral)){
 			return ServerResponse.error("请输入正确的积分格式");
 		}
@@ -82,6 +72,7 @@ public class UserManageController {
 		return userService.charge(id,integral);
 	}
 
+	@IgnoreLogin
 	@RequestMapping("integral_list.do")
 	@ResponseBody
 	public ServerResponse integralList(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
@@ -100,10 +91,6 @@ public class UserManageController {
 	                                     @RequestParam("username") String username,
 	                                     @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
 	                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		if (user == null) {
-			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(), "用户未登录,请登录管理员");
-		}
 		return userService.integralSearch(username, pageSize, pageNum);
 	}
 

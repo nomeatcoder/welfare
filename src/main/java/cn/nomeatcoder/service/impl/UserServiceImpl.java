@@ -37,6 +37,9 @@ public class UserServiceImpl implements UserService {
 	@Resource
 	private IntegralDetailMapper integralDetailMapper;
 
+	@Resource
+	private MyCache myCache;
+
 	@Override
 	public ServerResponse login(String username, String password) {
 		UserQuery query = new UserQuery();
@@ -123,7 +126,7 @@ public class UserServiceImpl implements UserService {
 		User user = userMapper.get(query);
 		if (user != null) {
 			String forgetToken = UUID.randomUUID().toString();
-			TokenCache.setKey(TokenCache.TOKEN_PREFIX + username, forgetToken);
+			myCache.setKey(MyCache.TOKEN_PREFIX + username, forgetToken);
 			return ServerResponse.success(forgetToken);
 		}
 		return ServerResponse.error("问题的答案错误");
@@ -139,7 +142,7 @@ public class UserServiceImpl implements UserService {
 			//用户不存在
 			return ServerResponse.error("用户不存在");
 		}
-		String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX + username);
+		String token = myCache.getKey(MyCache.TOKEN_PREFIX + username);
 		if (StringUtils.isBlank(token)) {
 			return ServerResponse.error("token无效或者过期");
 		}
@@ -202,14 +205,6 @@ public class UserServiceImpl implements UserService {
 			return ServerResponse.error("找不到当前用户");
 		}
 		return ServerResponse.success(user);
-	}
-
-	@Override
-	public ServerResponse checkAdminRole(User user) {
-		if (user != null && user.getRole().intValue() == Const.Role.ROLE_ADMIN) {
-			return ServerResponse.success();
-		}
-		return ServerResponse.error();
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package cn.nomeatcoder.common.vo;
 
-import cn.nomeatcoder.common.domain.Category;
 import lombok.Data;
 
 import java.util.List;

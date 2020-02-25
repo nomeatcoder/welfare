@@ -25,8 +25,6 @@ public interface UserService {
 
 	ServerResponse getInformation(Integer userId);
 
-	ServerResponse checkAdminRole(User user);
-
 	ServerResponse list(int pageSize, int pageNum);
 
 	ServerResponse search(String username, int pageSize, int pageNum);

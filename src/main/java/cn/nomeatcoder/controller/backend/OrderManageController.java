@@ -29,36 +29,13 @@ public class OrderManageController {
     @ResponseBody
     public ServerResponse orderList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
                                     @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
-
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
-        if(user == null){
-            return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
-
-        }
-        if(userService.checkAdminRole(user).isSuccess()){
-            //填充我们增加产品的业务逻辑
-            return orderService.manageList(pageNum,pageSize);
-        }else{
-            return ServerResponse.error("无权限操作");
-        }
+        return orderService.manageList(pageNum,pageSize);
     }
 
     @RequestMapping("detail.do")
     @ResponseBody
     public ServerResponse orderDetail(HttpSession session, Long orderNo){
-
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
-        if(user == null){
-            return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
-
-        }
-        if(userService.checkAdminRole(user).isSuccess()){
-            //填充我们增加产品的业务逻辑
-
-            return orderService.manageDetail(orderNo);
-        }else{
-            return ServerResponse.error("无权限操作");
-        }
+        return orderService.manageDetail(orderNo);
     }
 
 
@@ -67,17 +44,7 @@ public class OrderManageController {
     @ResponseBody
     public ServerResponse orderSearch(HttpSession session, Long orderNo, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum,
                                                 @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
-        if(user == null){
-            return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
-
-        }
-        if(userService.checkAdminRole(user).isSuccess()){
-            //填充我们增加产品的业务逻辑
-            return orderService.manageSearch(orderNo,pageNum,pageSize);
-        }else{
-            return ServerResponse.error("无权限操作");
-        }
+        return orderService.manageSearch(orderNo,pageNum,pageSize);
     }
 
 
@@ -85,18 +52,7 @@ public class OrderManageController {
     @RequestMapping("send_goods.do")
     @ResponseBody
     public ServerResponse orderSendGoods(HttpSession session, Long orderNo){
-
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
-        if(user == null){
-            return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(),"用户未登录,请登录管理员");
-
-        }
-        if(userService.checkAdminRole(user).isSuccess()){
-            //填充我们增加产品的业务逻辑
-            return orderService.manageSendGoods(orderNo);
-        }else{
-            return ServerResponse.error("无权限操作");
-        }
+        return orderService.manageSendGoods(orderNo);
     }
 
 }
