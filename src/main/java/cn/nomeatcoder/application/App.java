@@ -16,11 +16,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     "cn.nomeatcoder.service",
     "cn.nomeatcoder.common",
     "cn.nomeatcoder.config",
+    "cn.nomeatcoder.schedule",
 })
 @MapperScan(basePackages = {
     "cn.nomeatcoder.dal.mapper"
 })
 @EnableTransactionManagement
+@EnableScheduling
 public class App {
     public static void main( String[] args ) {
         SpringApplication.run(App.class, args);

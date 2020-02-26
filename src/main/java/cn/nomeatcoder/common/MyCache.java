@@ -19,15 +19,19 @@ public class MyCache {
 
 	public static final String TOKEN_PREFIX = "token_";
 
+	public static final String INDEX_INFO_KEY = "welfare_index_info";
+
+	public static final int REDIS_EXPIRE_TIME = 60 * 60;
+
 	private Cache<String, String> localCache = CacheBuilder.newBuilder()
 		.initialCapacity(1000)
 		.maximumSize(10000)
-		.expireAfterAccess(12, TimeUnit.HOURS)
+		.expireAfterAccess(1, TimeUnit.HOURS)
 		.build();
 
 	public void setKey(String key, String value) {
 		try {
-			stringRedisTemplate.opsForValue().set(key, value);
+			stringRedisTemplate.opsForValue().set(key, value, REDIS_EXPIRE_TIME, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("写入redis失败", e);
 			throw new BizException("服务异常");
