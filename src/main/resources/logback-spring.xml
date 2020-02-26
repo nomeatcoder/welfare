@@ -42,6 +42,38 @@
         </filter>
     </appender>
 
+    <appender name="PrintParamResult" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logs/welfare/facade-param.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/logs/welfare/facade-param.log.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <maxHistory>7</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %level %logger{64}.%method:%line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="PERFORMANCE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logs/welfare/performance.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/logs/welfare/performance.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <maxHistory>7</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %level %logger{64}.%method:%line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
     <springProfile name="dev">
         <root>
             <appender-ref ref="console" level="INFO"/>
@@ -49,6 +81,14 @@
     </springProfile>
 
     <springProfile name="!dev">
+        <logger name="cn.nomeatcoder.config.PrintParamResult" additivity="false">
+            <level value="INFO"/>
+            <appender-ref ref="PrintParamResult"/>
+        </logger>
+        <logger name="cn.nomeatcoder.config.PerformanceOuter" additivity="false">
+            <level value="${log.level}"/>
+            <appender-ref ref="PERFORMANCE"/>
+        </logger>
         <root>
             <appender-ref ref="welfare" level="INFO"/>
             <appender-ref ref="error" level="ERROR"/>
