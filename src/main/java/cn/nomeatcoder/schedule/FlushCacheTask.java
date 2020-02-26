@@ -3,6 +3,7 @@ package cn.nomeatcoder.schedule;
 import cn.nomeatcoder.common.MyCache;
 import cn.nomeatcoder.common.vo.IndexVo;
 import cn.nomeatcoder.service.CategoryService;
+import cn.nomeatcoder.service.ProductService;
 import cn.nomeatcoder.utils.GsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,6 +21,9 @@ public class FlushCacheTask {
 	@Resource
 	private MyCache myCache;
 
+	@Resource
+	private ProductService productService;
+
 	@Scheduled(cron="0 0/5 * * * ? ")
 	public void flushIndexVo() {
 		log.info("[flushIndexVo] begin");
@@ -28,4 +32,5 @@ public class FlushCacheTask {
 		myCache.setKey(MyCache.INDEX_INFO_KEY, GsonUtils.toJson(indexVo));
 		log.info("[flushIndexVo] end. cost time:{}ms", System.currentTimeMillis() - begin);
 	}
+
 }

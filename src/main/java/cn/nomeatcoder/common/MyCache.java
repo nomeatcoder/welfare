@@ -21,6 +21,8 @@ public class MyCache {
 
 	public static final String INDEX_INFO_KEY = "welfare_index_info";
 
+	public static final String PRODUCT_DETAIL_KEY = "welfare_product_detail_%s";
+
 	public static final int REDIS_EXPIRE_TIME = 60 * 60;
 
 	private Cache<String, String> localCache = CacheBuilder.newBuilder()
@@ -33,6 +35,7 @@ public class MyCache {
 		try {
 			stringRedisTemplate.opsForValue().set(key, value, REDIS_EXPIRE_TIME, TimeUnit.SECONDS);
 		} catch (Exception e) {
+			log.error("写入redis失败, key{}, value:{}", key, value);
 			log.error("写入redis失败", e);
 			throw new BizException("服务异常");
 		}
@@ -45,6 +48,7 @@ public class MyCache {
 			try {
 				value = stringRedisTemplate.opsForValue().get(key);
 			} catch (Exception e) {
+				log.error("查询redis失败, key:{}", key);
 				log.error("查询redis失败", e);
 				throw new BizException("服务异常");
 			}

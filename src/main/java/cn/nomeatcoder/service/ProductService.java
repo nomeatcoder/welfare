@@ -3,6 +3,7 @@ package cn.nomeatcoder.service;
 
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.Product;
+import cn.nomeatcoder.common.vo.ProductDetailVo;
 
 public interface ProductService {
 
@@ -17,6 +18,8 @@ public interface ProductService {
     ServerResponse searchProduct(String productName, Integer productId, int pageNum, int pageSize);
 
     ServerResponse getProductDetail(Integer productId);
+
+    ProductDetailVo getProductDetailVo(Integer productId);
 
     ServerResponse deleteProduct(Integer productId);
 

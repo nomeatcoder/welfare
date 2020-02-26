@@ -1,10 +1,7 @@
 package cn.nomeatcoder.service.impl;
 
 
-import cn.nomeatcoder.common.Const;
-import cn.nomeatcoder.common.PageInfo;
-import cn.nomeatcoder.common.ResponseCode;
-import cn.nomeatcoder.common.ServerResponse;
+import cn.nomeatcoder.common.*;
 import cn.nomeatcoder.common.domain.Category;
 import cn.nomeatcoder.common.domain.Product;
 import cn.nomeatcoder.common.query.CategoryQuery;
@@ -15,6 +12,7 @@ import cn.nomeatcoder.dal.mapper.CategoryMapper;
 import cn.nomeatcoder.dal.mapper.ProductMapper;
 import cn.nomeatcoder.service.CategoryService;
 import cn.nomeatcoder.service.ProductService;
+import cn.nomeatcoder.utils.GsonUtils;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -36,6 +34,9 @@ public class ProductServiceImpl implements ProductService {
 	@Resource
 	private CategoryService categoryService;
 
+	@Resource
+	private MyCache myCache;
+
 	@Override
 	public ServerResponse saveOrUpdateProduct(Product product) {
 		if (product != null) {
@@ -49,12 +50,14 @@ public class ProductServiceImpl implements ProductService {
 			if (product.getId() != null) {
 				int rowCount = productMapper.update(product);
 				if (rowCount > 0) {
+					updateProductDetailVoCache(product.getId(), product);
 					return ServerResponse.success("更新产品成功");
 				}
 				return ServerResponse.success("更新产品失败");
 			} else {
 				int rowCount = (int) productMapper.insert(product);
 				if (rowCount > 0) {
+					updateProductDetailVoCache(product.getId(), product);
 					return ServerResponse.success("新增产品成功");
 				}
 				return ServerResponse.success("新增产品失败");
@@ -74,6 +77,7 @@ public class ProductServiceImpl implements ProductService {
 		product.setStatus(status);
 		int rowCount = productMapper.update(product);
 		if (rowCount > 0) {
+			updateProductDetailVoCache(product.getId(), product);
 			return ServerResponse.success("修改产品销售状态成功");
 		}
 		return ServerResponse.error("修改产品销售状态失败");
@@ -186,17 +190,33 @@ public class ProductServiceImpl implements ProductService {
 		if (productId == null) {
 			return ServerResponse.error(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
 		}
+		String key = String.format(MyCache.PRODUCT_DETAIL_KEY, productId);
+		String json = myCache.getKey(key);
+		ProductDetailVo productDetailVo;
+		if (json == null) {
+			productDetailVo = getProductDetailVo(productId);
+			if (productDetailVo != null) {
+				myCache.setKey(key, GsonUtils.toJson(productDetailVo));
+			}
+		} else {
+			productDetailVo = GsonUtils.fromGson2Obj(json, ProductDetailVo.class);
+		}
+		if (productDetailVo == null) {
+			return ServerResponse.error("产品不存在");
+		}
+		if (productDetailVo.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
+			return ServerResponse.error("产品已下架或者删除");
+		}
+		return ServerResponse.success(productDetailVo);
+	}
+
+	@Override
+	public ProductDetailVo getProductDetailVo(Integer productId) {
 		ProductQuery query = new ProductQuery();
 		query.setId(productId);
 		Product product = productMapper.get(query);
-		if (product == null) {
-			return ServerResponse.error("产品已下架或者删除");
-		}
-		if (product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
-			return ServerResponse.error("产品已下架或者删除");
-		}
 		ProductDetailVo productDetailVo = assembleProductDetailVo(product);
-		return ServerResponse.success(productDetailVo);
+		return productDetailVo;
 	}
 
 	@Override
@@ -208,6 +228,7 @@ public class ProductServiceImpl implements ProductService {
 		query.setId(productId);
 		int rowCount = productMapper.delete(query);
 		if (rowCount > 0) {
+			updateProductDetailVoCache(productId, null);
 			return ServerResponse.success("删除产品成功");
 		}
 		return ServerResponse.error("删除产品失败");
@@ -261,5 +282,9 @@ public class ProductServiceImpl implements ProductService {
 		return ServerResponse.success(pageInfo);
 	}
 
+
+	private void updateProductDetailVoCache(Integer productId, Product product) {
+		myCache.setKey(String.format(MyCache.PRODUCT_DETAIL_KEY, productId), GsonUtils.toJson(product));
+	}
 
 }
