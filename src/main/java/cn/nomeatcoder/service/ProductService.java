@@ -19,7 +19,7 @@ public interface ProductService {
 
     ServerResponse getProductDetail(Integer productId);
 
-    ProductDetailVo getProductDetailVo(Integer productId);
+    Product getProduct(Integer productId);
 
     ServerResponse deleteProduct(Integer productId);
 

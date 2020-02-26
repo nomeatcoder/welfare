@@ -72,8 +72,12 @@ public class ProductServiceImpl implements ProductService {
 		if (productId == null || status == null) {
 			return ServerResponse.error(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
 		}
-		Product product = new Product();
-		product.setId(productId);
+		ProductQuery query = new ProductQuery();
+		query.setId(productId);
+		Product product = productMapper.get(query);
+		if(product == null){
+			return ServerResponse.error("产品不存在");
+		}
 		product.setStatus(status);
 		int rowCount = productMapper.update(product);
 		if (rowCount > 0) {
@@ -194,7 +198,8 @@ public class ProductServiceImpl implements ProductService {
 		String json = myCache.getKey(key);
 		ProductDetailVo productDetailVo;
 		if (json == null) {
-			productDetailVo = getProductDetailVo(productId);
+			Product product = getProduct(productId);
+			productDetailVo = assembleProductDetailVo(product);
 			if (productDetailVo != null) {
 				myCache.setKey(key, GsonUtils.toJson(productDetailVo));
 			}
@@ -211,12 +216,11 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public ProductDetailVo getProductDetailVo(Integer productId) {
+	public Product getProduct(Integer productId) {
 		ProductQuery query = new ProductQuery();
 		query.setId(productId);
 		Product product = productMapper.get(query);
-		ProductDetailVo productDetailVo = assembleProductDetailVo(product);
-		return productDetailVo;
+		return product;
 	}
 
 	@Override
@@ -284,7 +288,8 @@ public class ProductServiceImpl implements ProductService {
 
 
 	private void updateProductDetailVoCache(Integer productId, Product product) {
-		myCache.setKey(String.format(MyCache.PRODUCT_DETAIL_KEY, productId), GsonUtils.toJson(product));
+		ProductDetailVo productDetailVo = assembleProductDetailVo(product);
+		myCache.setKey(String.format(MyCache.PRODUCT_DETAIL_KEY, productId), GsonUtils.toJson(productDetailVo));
 	}
 
 }
