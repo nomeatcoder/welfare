@@ -1,4 +1,7 @@
-package cn.nomeatcoder.common;
+package cn.nomeatcoder.dal.mapper;
+
+import cn.nomeatcoder.common.Domain;
+import cn.nomeatcoder.common.Query;
 
 import java.util.List;
 

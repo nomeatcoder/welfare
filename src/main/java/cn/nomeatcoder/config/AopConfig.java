@@ -85,7 +85,7 @@ public class AopConfig implements BeanDefinitionRegistryPostProcessor {
 	@DependsOn({"performanceInner"})
 	public Advisor performanceInnerAdvisor(@Qualifier("performanceInner") PerformanceInner performanceInner) {
 		AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
-		advisor.setExpression("execution(* cn.nomeatcoder.service.*Service+.*(..)) or execution(* cn.nomeatcoder.dal.*Mapper.*(..)) or execution(* cn.nomeatcoder.common.MyCache.*(..))");
+		advisor.setExpression("execution(* cn.nomeatcoder.service.*Service+.*(..)) or execution(* cn.nomeatcoder.dal.mapper.*Mapper.*(..)) or execution(* cn.nomeatcoder.common.MyCache.*(..))");
 		advisor.setAdvice(performanceInner);
 		// advisor.setOrder(1000);
 		return advisor;

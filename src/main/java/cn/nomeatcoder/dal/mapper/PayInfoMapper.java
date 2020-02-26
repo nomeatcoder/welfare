@@ -1,6 +1,5 @@
 package cn.nomeatcoder.dal.mapper;
 
-import cn.nomeatcoder.common.Mapper;
 import cn.nomeatcoder.common.domain.PayInfo;
 import cn.nomeatcoder.common.query.PayInfoQuery;
 

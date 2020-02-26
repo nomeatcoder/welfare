@@ -1,6 +1,5 @@
 package cn.nomeatcoder.dal.mapper;
 
-import cn.nomeatcoder.common.Mapper;
 import cn.nomeatcoder.common.domain.Cart;
 import cn.nomeatcoder.common.query.CartQuery;
 import org.apache.ibatis.annotations.Param;

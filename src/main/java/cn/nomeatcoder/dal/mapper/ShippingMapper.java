@@ -1,6 +1,5 @@
 package cn.nomeatcoder.dal.mapper;
 
-import cn.nomeatcoder.common.Mapper;
 import cn.nomeatcoder.common.domain.Shipping;
 import cn.nomeatcoder.common.query.ShippingQuery;
 

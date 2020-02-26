@@ -74,6 +74,22 @@
         </encoder>
     </appender>
 
+    <appender name="SQL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logs/welfare/sql.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>/logs/welfare/sql.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <maxHistory>7</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %level %logger{64}.%method:%line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
     <springProfile name="dev">
         <root>
             <appender-ref ref="console" level="INFO"/>
@@ -86,8 +102,12 @@
             <appender-ref ref="PrintParamResult"/>
         </logger>
         <logger name="cn.nomeatcoder.config.PerformanceOuter" additivity="false">
-            <level value="${log.level}"/>
+            <level value="INFO"/>
             <appender-ref ref="PERFORMANCE"/>
+        </logger>
+        <logger name="mapper" additivity="false">
+            <level value="DEBUG"/>
+            <appender-ref ref="SQL"/>
         </logger>
         <root>
             <appender-ref ref="welfare" level="INFO"/>
