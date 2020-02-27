@@ -4,7 +4,7 @@ import cn.nomeatcoder.common.Const;
 import cn.nomeatcoder.common.PageInfo;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.*;
-import cn.nomeatcoder.common.error.BizException;
+import cn.nomeatcoder.common.exception.BizException;
 import cn.nomeatcoder.common.query.*;
 import cn.nomeatcoder.common.vo.OrderItemVo;
 import cn.nomeatcoder.common.vo.OrderProductVo;
@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -685,5 +686,36 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 		return ServerResponse.error("订单不存在");
+	}
+
+	@Override
+	public void closeOrder(int time) {
+		Date closeDateTime = DateUtils.addMinutes(new Date(), -15);
+		List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(), Const.DF.format(closeDateTime));
+
+		for (Order order : orderList) {
+			OrderItemQuery query = new OrderItemQuery();
+			query.setOrderNo(order.getOrderNo());
+			List<OrderItem> orderItemList = orderItemMapper.find(query);
+			for (OrderItem orderItem : orderItemList) {
+
+				ProductQuery productQuery = new ProductQuery();
+				productQuery.setId(orderItem.getProductId());
+				Product product = productMapper.get(productQuery);
+				if (product == null) {
+					continue;
+				}
+				Integer stock = product.getStock();
+				product = new Product();
+				product.setId(orderItem.getProductId());
+				product.setStock(stock + orderItem.getQuantity());
+				productMapper.update(product);
+			}
+			Order newOrder = new Order();
+			newOrder.setId(order.getId());
+			newOrder.setStatus(Const.OrderStatusEnum.CANCELED.getCode());
+			orderMapper.update(newOrder);
+			log.info("[closeOrder] 关闭订单OrderNo：{}", order.getOrderNo());
+		}
 	}
 }

@@ -32,4 +32,5 @@ public interface OrderService {
 
 	ServerResponse manageSendGoods(Long orderNo);
 
+	void closeOrder(int time);
 }

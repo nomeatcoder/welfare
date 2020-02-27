@@ -242,4 +242,16 @@
         WHERE
         id = #{id}
     </update>
+
+    <select id="selectOrderStatusByCreateTime" resultMap="result" parameterType="map">
+        SELECT
+        <include refid="columns"/>
+        from
+        <include refid="table"/>
+        where status = #{status}
+        <![CDATA[
+        and create_time <= #{date}
+        ]]>
+        order by create_time desc
+    </select>
 </mapper>

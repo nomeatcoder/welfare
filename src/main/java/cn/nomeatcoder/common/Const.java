@@ -1,6 +1,6 @@
 package cn.nomeatcoder.common;
 
-import cn.nomeatcoder.common.error.BizException;
+import cn.nomeatcoder.common.exception.BizException;
 import com.google.common.collect.Sets;
 
 import java.text.SimpleDateFormat;

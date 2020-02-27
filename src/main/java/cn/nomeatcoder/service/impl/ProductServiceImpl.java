@@ -16,6 +16,7 @@ import cn.nomeatcoder.utils.GsonUtils;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
 	@Resource
 	private MyCache myCache;
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ServerResponse saveOrUpdateProduct(Product product) {
 		if (product != null) {
@@ -66,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
 		return ServerResponse.error("新增或更新产品参数不正确");
 	}
 
-
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ServerResponse setSaleStatus(Integer productId, Integer status) {
 		if (productId == null || status == null) {
@@ -223,6 +225,7 @@ public class ProductServiceImpl implements ProductService {
 		return product;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ServerResponse deleteProduct(Integer productId) {
 		if (productId == null) {

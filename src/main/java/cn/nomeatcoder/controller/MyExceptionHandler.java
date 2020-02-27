@@ -2,7 +2,7 @@ package cn.nomeatcoder.controller;
 
 import cn.nomeatcoder.common.ResponseCode;
 import cn.nomeatcoder.common.ServerResponse;
-import cn.nomeatcoder.common.error.BizException;
+import cn.nomeatcoder.common.exception.BizException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

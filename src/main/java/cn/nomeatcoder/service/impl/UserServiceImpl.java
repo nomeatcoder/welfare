@@ -3,7 +3,7 @@ package cn.nomeatcoder.service.impl;
 import cn.nomeatcoder.common.*;
 import cn.nomeatcoder.common.domain.IntegralDetail;
 import cn.nomeatcoder.common.domain.User;
-import cn.nomeatcoder.common.error.BizException;
+import cn.nomeatcoder.common.exception.BizException;
 import cn.nomeatcoder.common.query.IntegralDetailQuery;
 import cn.nomeatcoder.common.query.UserQuery;
 import cn.nomeatcoder.common.vo.IntegralDetailVo;

@@ -21,9 +21,6 @@ public class FlushCacheTask {
 	@Resource
 	private MyCache myCache;
 
-	@Resource
-	private ProductService productService;
-
 	@Scheduled(cron="0 0/5 * * * ? ")
 	public void flushIndexVo() {
 		log.info("[flushIndexVo] begin");
