@@ -198,23 +198,22 @@ public class ProductServiceImpl implements ProductService {
 		}
 		String key = String.format(MyCache.PRODUCT_DETAIL_KEY, productId);
 		String json = myCache.getKey(key);
-		ProductDetailVo productDetailVo;
+		Product product;
 		if (json == null) {
-			Product product = getProduct(productId);
-			productDetailVo = assembleProductDetailVo(product);
-			if (productDetailVo != null) {
-				myCache.setKey(key, GsonUtils.toJson(productDetailVo));
+			product = getProduct(productId);
+			if (product != null) {
+				myCache.setKey(key, GsonUtils.toJson(product));
 			}
 		} else {
-			productDetailVo = GsonUtils.fromGson2Obj(json, ProductDetailVo.class);
+			product = GsonUtils.fromGson2Obj(json, Product.class);
 		}
-		if (productDetailVo == null) {
+		if (product == null) {
 			return ServerResponse.error("产品不存在");
 		}
-		if (productDetailVo.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
+		if (product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
 			return ServerResponse.error("产品已下架或者删除");
 		}
-		return ServerResponse.success(productDetailVo);
+		return ServerResponse.success(assembleProductDetailVo(product));
 	}
 
 	@Override

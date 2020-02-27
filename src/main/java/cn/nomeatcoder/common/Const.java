@@ -20,7 +20,8 @@ public class Const {
 	//线上域名需要备案,所以本机用内网穿透验证,线上不验证
 	public static final String ALIPAY_CALLBACK_URL = "http://dfuyyu.natappfree.cc/order/alipay_callback.do";
 	public static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	public static final int SESSION_EXPIRE_TIME = 60 * 30;
+	public static final int REDIS_EXPIRE_TIME = 5;
+	public static final int CLOSE_ORDER_TIME = 15;
 	public interface ProductListOrderBy{
 		Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_desc","price_asc");
 	}

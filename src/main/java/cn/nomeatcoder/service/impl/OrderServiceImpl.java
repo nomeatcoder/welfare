@@ -1,8 +1,10 @@
 package cn.nomeatcoder.service.impl;
 
 import cn.nomeatcoder.common.Const;
+import cn.nomeatcoder.common.MyCache;
 import cn.nomeatcoder.common.PageInfo;
 import cn.nomeatcoder.common.ServerResponse;
+import cn.nomeatcoder.common.async.InternalEventBus;
 import cn.nomeatcoder.common.domain.*;
 import cn.nomeatcoder.common.exception.BizException;
 import cn.nomeatcoder.common.query.*;
@@ -12,9 +14,11 @@ import cn.nomeatcoder.common.vo.OrderVo;
 import cn.nomeatcoder.common.vo.ShippingVo;
 import cn.nomeatcoder.dal.mapper.*;
 import cn.nomeatcoder.service.OrderService;
+import cn.nomeatcoder.service.ProductService;
 import cn.nomeatcoder.service.UserService;
 import cn.nomeatcoder.utils.BigDecimalUtils;
 import cn.nomeatcoder.utils.FTPUtils;
+import cn.nomeatcoder.utils.GsonUtils;
 import com.alipay.api.AlipayResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.demo.trade.config.Configs;
@@ -30,6 +34,8 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,10 +46,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
+
+	private static final String UPDATE_STOCK_KEY = "welfare_update_stock_%s";
 
 	@Resource
 	private OrderMapper orderMapper;
@@ -71,6 +80,18 @@ public class OrderServiceImpl implements OrderService {
 	@Resource
 	private UserService userService;
 
+	@Resource
+	private MyCache myCache;
+
+	@Resource
+	private ProductService productService;
+
+	@Resource
+	private Redisson redisson;
+
+	@Resource
+	private InternalEventBus internalEventBus;
+
 	static {
 
 		/** 一定要在创建AlipayTradeService之前调用Configs.init()设置默认参数
@@ -88,61 +109,79 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public ServerResponse createOrder(Integer userId, Integer shippingId) {
 
-		//从购物车中获取数据
-		CartQuery query = new CartQuery();
-		query.setUserId(userId);
-		List<Cart> cartList = cartMapper.find(query);
-
-		//计算这个订单的总价
-		ServerResponse serverResponse = this.getCartOrderItem(userId, cartList);
-		if (!serverResponse.isSuccess()) {
-			return serverResponse;
+		//防止重复下单
+		String key = String.format(MyCache.CREATE_ORDER_KEY, userId);
+		RLock lock = redisson.getLock(key);
+		boolean hasLock = false;
+		try {
+			hasLock = lock.tryLock(Const.REDIS_EXPIRE_TIME, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			log.error("[createOrder] throw exception", e);
 		}
-		List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
-		BigDecimal payment = this.getOrderTotalPrice(orderItemList);
-
-		//查询积分
-		UserQuery userQuery = new UserQuery();
-		userQuery.setId(userId);
-		User user = userMapper.get(userQuery);
-		BigDecimal integral = user.getIntegral();
-		BigDecimal useIntegral;
-		BigDecimal minPayment = new BigDecimal("0.01");
-		if (integral.doubleValue() >= payment.subtract(minPayment).doubleValue()) {
-			useIntegral = payment.subtract(minPayment);
-		} else {
-			useIntegral = integral;
+		if (!hasLock) {
+			log.info("[createOrder] 获取分布式锁失败, key:{}", key);
+			return ServerResponse.error("请勿重复操作");
 		}
-		user.setIntegral(integral.subtract(useIntegral));
-		int rowCount = userMapper.update(user);
-		if (rowCount <= 0) {
-			throw new BizException("更新用户失败");
-		}
-		userService.insertIntegralDetail(user, 1, useIntegral, user.getIntegral());
-		//生成订单
-		Order order = this.assembleOrder(userId, shippingId, payment, useIntegral);
-		if (order == null) {
-			return ServerResponse.error("生成订单错误");
-		}
-		if (CollectionUtils.isEmpty(orderItemList)) {
-			return ServerResponse.error("购物车为空");
-		}
-		for (OrderItem orderItem : orderItemList) {
-			orderItem.setOrderNo(order.getOrderNo());
-		}
+		log.info("[createOrder] 获取分布式锁成功, key:{}", key);
+		try {
+			//从购物车中获取数据
+			CartQuery query = new CartQuery();
+			query.setUserId(userId);
+			List<Cart> cartList = cartMapper.find(query);
 
+			//计算这个订单的总价
+			ServerResponse serverResponse = this.getCartOrderItem(userId, cartList);
+			if (!serverResponse.isSuccess()) {
+				return serverResponse;
+			}
+			List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
+			BigDecimal payment = this.getOrderTotalPrice(orderItemList);
 
-		//mybatis 批量插入
-		orderItemMapper.batchInsert(orderItemList);
+			//查询积分
+			UserQuery userQuery = new UserQuery();
+			userQuery.setId(userId);
+			User user = userMapper.get(userQuery);
+			BigDecimal integral = user.getIntegral();
+			BigDecimal useIntegral;
+			BigDecimal minPayment = new BigDecimal("0.01");
+			if (integral.doubleValue() >= payment.subtract(minPayment).doubleValue()) {
+				useIntegral = payment.subtract(minPayment);
+			} else {
+				useIntegral = integral;
+			}
+			user.setIntegral(integral.subtract(useIntegral));
+			int rowCount = userMapper.update(user);
+			if (rowCount <= 0) {
+				throw new BizException("更新用户积分失败");
+			}
+			userService.insertIntegralDetail(user, 1, useIntegral, user.getIntegral());
+			//生成订单
+			Order order = this.assembleOrder(userId, shippingId, payment, useIntegral);
+			if (order == null) {
+				return ServerResponse.error("生成订单错误");
+			}
+			if (CollectionUtils.isEmpty(orderItemList)) {
+				return ServerResponse.error("购物车为空");
+			}
+			for (OrderItem orderItem : orderItemList) {
+				orderItem.setOrderNo(order.getOrderNo());
+			}
 
-		//生成成功,我们要减少我们产品的库存
-		this.reduceProductStock(orderItemList);
-		//清空一下购物车
-		this.cleanCart(cartList);
+			//mybatis 批量插入
+			orderItemMapper.batchInsert(orderItemList);
 
-		//返回给前端数据
-		OrderVo orderVo = assembleOrderVo(order, orderItemList);
-		return ServerResponse.success(orderVo);
+			//生成成功,我们要减少我们产品的库存
+			this.reduceProductStock(orderItemList);
+			//清空一下购物车
+			this.cleanCart(cartList);
+
+			//返回给前端数据
+			OrderVo orderVo = assembleOrderVo(order, orderItemList);
+			return ServerResponse.success(orderVo);
+		} finally {
+			lock.unlock();
+			log.info("[createOrder] 分布式锁解锁, key:{}", key);
+		}
 	}
 
 
@@ -233,7 +272,38 @@ public class OrderServiceImpl implements OrderService {
 
 
 	private void reduceProductStock(List<OrderItem> orderItemList) {
-		productMapper.reduceStock(orderItemList);
+
+		//先扣减缓存中的库存
+		orderItemList.forEach(v -> {
+			Integer productId = v.getProductId();
+			String key = String.format(UPDATE_STOCK_KEY, productId);
+			RLock lock = redisson.getLock(key);
+			//保证缓存商品的互斥访问，解决超卖问题
+			lock.lock(Const.REDIS_EXPIRE_TIME, TimeUnit.SECONDS);
+			try {
+				log.info("[reduceProductStock] 获取分布式锁成功, key:{}", key);
+				String productKey = String.format(MyCache.PRODUCT_DETAIL_KEY, productId);
+				String json = myCache.getKey(productKey);
+				if (json == null) {
+					throw new BizException("缓存中商品信息不存在");
+				}
+				Product product = GsonUtils.fromGson2Obj(json, Product.class);
+				Integer want = v.getQuantity();
+				Integer stock = product.getStock();
+				if (want > stock) {
+					log.error("商品库存不足, productId:{}, quantity:{}, stock:{}", productId, want, stock);
+					throw new BizException("商品库存不足");
+				}
+				product.setStock(stock - want);
+				myCache.setKey(productKey, GsonUtils.toJson(product));
+			} finally {
+				lock.unlock();
+				log.info("[reduceProductStock] 分布式锁解锁, key:{}", key);
+			}
+
+		});
+		//异步更新数据库
+		internalEventBus.post(orderItemList);
 	}
 
 
@@ -281,9 +351,27 @@ public class OrderServiceImpl implements OrderService {
 		//校验购物车的数据,包括产品的状态和数量
 		for (Cart cartItem : cartList) {
 			OrderItem orderItem = new OrderItem();
-			ProductQuery query = new ProductQuery();
-			query.setId(cartItem.getProductId());
-			Product product = productMapper.get(query);
+
+			//先从缓存获取商品信息
+			Integer productId = cartItem.getProductId();
+			String key = String.format(MyCache.PRODUCT_DETAIL_KEY, productId);
+			String json = myCache.getKey(key);
+			Product product;
+			//缓存不存在
+			if (json == null) {
+				//查db写缓存
+				product = productService.getProduct(productId);
+				if (product != null) {
+					myCache.setKey(key, GsonUtils.toJson(product));
+				}
+			} else {
+				//缓存存在
+				product = GsonUtils.fromGson2Obj(json, Product.class);
+			}
+			if (product == null) {
+				return ServerResponse.error("产品不存在");
+			}
+
 			if (Const.ProductStatusEnum.ON_SALE.getCode() != product.getStatus()) {
 				return ServerResponse.error("产品" + product.getName() + "不是在线售卖状态");
 			}
@@ -319,27 +407,70 @@ public class OrderServiceImpl implements OrderService {
 		if (order.getStatus() != Const.OrderStatusEnum.NO_PAY.getCode()) {
 			return ServerResponse.error("已付款,无法取消订单");
 		}
-		Order updateOrder = new Order();
-		updateOrder.setId(order.getId());
-		updateOrder.setStatus(Const.OrderStatusEnum.CANCELED.getCode());
-
-		int row = orderMapper.update(updateOrder);
-		if (row > 0) {
-			//退还积分
-			UserQuery userQuery = new UserQuery();
-			userQuery.setId(userId);
-			User user = userMapper.get(userQuery);
-			user.setIntegral(user.getIntegral().add(order.getUseIntegral()));
-			int rowCount = userMapper.update(user);
-			if (rowCount <= 0) {
-				throw new BizException("更新积分失败");
-			}
-			userService.insertIntegralDetail(user, 2, order.getUseIntegral(), user.getIntegral());
-			return ServerResponse.success();
-		}
-		return ServerResponse.error();
+		return cancelOrder(order, Const.OrderStatusEnum.CANCELED.getCode());
 	}
 
+	private ServerResponse cancelOrder(Order order, Integer status) {
+
+		//防止重复关单
+		String key = String.format(MyCache.CLOSE_ORDER_KEY, order.getOrderNo());
+		RLock lock = redisson.getLock(key);
+		boolean hasLock = false;
+		try {
+			hasLock = lock.tryLock(Const.REDIS_EXPIRE_TIME, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			log.error("[cancelOrder] throw exception", e);
+		}
+		if (!hasLock) {
+			log.info("[cancelOrder] 获取分布式锁失败, key:{}", key);
+			return ServerResponse.error("重复关单");
+		}
+		log.info("[cancelOrder] 获取分布式锁成功, key:{}", key);
+		try {
+			Order updateOrder = new Order();
+			updateOrder.setId(order.getId());
+			updateOrder.setStatus(status);
+
+			int row = orderMapper.update(updateOrder);
+			if (row > 0) {
+				//退还库存
+				OrderItemQuery orderItemQuery = new OrderItemQuery();
+				orderItemQuery.setOrderNo(order.getOrderNo());
+				List<OrderItem> orderItemList = orderItemMapper.find(orderItemQuery);
+				for (OrderItem orderItem : orderItemList) {
+
+					ProductQuery productQuery = new ProductQuery();
+					productQuery.setId(orderItem.getProductId());
+					Product product = productMapper.get(productQuery);
+					if (product == null) {
+						continue;
+					}
+					Integer stock = product.getStock();
+					product = new Product();
+					product.setId(orderItem.getProductId());
+					product.setStock(stock + orderItem.getQuantity());
+					productMapper.update(product);
+				}
+				//退还积分
+				UserQuery userQuery = new UserQuery();
+				userQuery.setId(order.getUserId());
+				User user = userMapper.get(userQuery);
+				user.setIntegral(user.getIntegral().add(order.getUseIntegral()));
+				int rowCount = userMapper.update(user);
+				if (rowCount <= 0) {
+					throw new BizException("更新积分失败");
+				}
+				userService.insertIntegralDetail(user, 2, order.getUseIntegral(), user.getIntegral());
+				return ServerResponse.success();
+			}
+			return ServerResponse.error();
+		} finally {
+			lock.unlock();
+			log.info("[cancelOrder] 分布式锁解锁, key:{}", key);
+		}
+	}
+
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ServerResponse del(Integer userId, Long orderNo) {
 		OrderQuery query = new OrderQuery();
@@ -348,6 +479,13 @@ public class OrderServiceImpl implements OrderService {
 		Order order = orderMapper.get(query);
 		if (order == null) {
 			return ServerResponse.error("该用户此订单不存在");
+		}
+		//订单未支付
+		if (order.getStatus().intValue() < Const.OrderStatusEnum.PAID.getCode()) {
+			ServerResponse serverResponse = cancelOrder(order, Const.OrderStatusEnum.ORDER_CLOSE.getCode());
+			if (!serverResponse.isSuccess()) {
+				throw new BizException("删除订单失败");
+			}
 		}
 		int rowCount = orderMapper.delete(order);
 		if (rowCount > 0) {
@@ -387,7 +525,7 @@ public class OrderServiceImpl implements OrderService {
 		userQuery.setId(userId);
 		User user = userMapper.get(userQuery);
 		BigDecimal integral = user.getIntegral();
-		BigDecimal useIntegral = user.getIntegral();
+		BigDecimal useIntegral;
 		BigDecimal minPayment = new BigDecimal("0.01");
 		if (integral.doubleValue() >= payment.subtract(minPayment).doubleValue()) {
 			useIntegral = payment.subtract(minPayment);
@@ -604,7 +742,7 @@ public class OrderServiceImpl implements OrderService {
 		if (order == null) {
 			return ServerResponse.error("用户没有该订单");
 		}
-		if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()) {
+		if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode() && order.getStatus() <= Const.OrderStatusEnum.ORDER_CLOSE.getCode()) {
 			return ServerResponse.success();
 		}
 		return ServerResponse.error();
@@ -694,28 +832,12 @@ public class OrderServiceImpl implements OrderService {
 		List<Order> orderList = orderMapper.selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(), Const.DF.format(closeDateTime));
 
 		for (Order order : orderList) {
-			OrderItemQuery query = new OrderItemQuery();
-			query.setOrderNo(order.getOrderNo());
-			List<OrderItem> orderItemList = orderItemMapper.find(query);
-			for (OrderItem orderItem : orderItemList) {
-
-				ProductQuery productQuery = new ProductQuery();
-				productQuery.setId(orderItem.getProductId());
-				Product product = productMapper.get(productQuery);
-				if (product == null) {
-					continue;
-				}
-				Integer stock = product.getStock();
-				product = new Product();
-				product.setId(orderItem.getProductId());
-				product.setStock(stock + orderItem.getQuantity());
-				productMapper.update(product);
+			ServerResponse serverResponse = cancelOrder(order, Const.OrderStatusEnum.ORDER_CLOSE.getCode());
+			if (serverResponse.isSuccess()) {
+				log.info("[closeOrder] 关闭订单OrderNo：{}", order.getOrderNo());
+			} else {
+				log.info("[closeOrder] 关闭订单OrderNo失败：{}", order.getOrderNo());
 			}
-			Order newOrder = new Order();
-			newOrder.setId(order.getId());
-			newOrder.setStatus(Const.OrderStatusEnum.CANCELED.getCode());
-			orderMapper.update(newOrder);
-			log.info("[closeOrder] 关闭订单OrderNo：{}", order.getOrderNo());
 		}
 	}
 }

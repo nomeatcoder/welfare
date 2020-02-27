@@ -23,6 +23,10 @@ public class MyCache {
 
 	public static final String PRODUCT_DETAIL_KEY = "welfare_product_detail_%s";
 
+	public static final String CREATE_ORDER_KEY = "welfare_create_order_%s";
+
+	public static final String CLOSE_ORDER_KEY = "welfare_close_order_%s";
+
 	public static final int REDIS_EXPIRE_TIME = 60 * 60;
 
 	private Cache<String, String> localCache = CacheBuilder.newBuilder()

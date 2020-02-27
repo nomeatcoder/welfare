@@ -1,5 +1,6 @@
 package cn.nomeatcoder.schedule;
 
+import cn.nomeatcoder.common.Const;
 import cn.nomeatcoder.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
@@ -15,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 public class CloseOrderTask {
 
 	private static final String CLOSE_ORDER_KEY = "welfare_close_order";
-	private static final int EXPIRE_TIME = 5;
-	private static final int CLOSE_ORDER_TIME = 15;
 
 	@Resource
 	private OrderService orderService;
@@ -29,20 +28,20 @@ public class CloseOrderTask {
 		log.info("[closeOrder] begin");
 		long begin = System.currentTimeMillis();
 		RLock lock = redisson.getLock(CLOSE_ORDER_KEY);
-		boolean hasLock = lock.tryLock(EXPIRE_TIME, TimeUnit.SECONDS);
+		boolean hasLock = lock.tryLock(Const.REDIS_EXPIRE_TIME, TimeUnit.SECONDS);
 		try {
 			if (hasLock) {
-				log.info("[closeOrder] 获取分布式锁成功");
-				orderService.closeOrder(CLOSE_ORDER_TIME);
+				log.info("[closeOrder] 获取分布式锁成功, key:{}", CLOSE_ORDER_KEY);
+				orderService.closeOrder(Const.CLOSE_ORDER_TIME);
 			} else {
-				log.info("[closeOrder] 获取分布式锁失败");
+				log.info("[closeOrder] 获取分布式锁失败, key:{}", CLOSE_ORDER_KEY);
 			}
 		} catch (Exception e) {
 			log.error("[closeOrder] throw exception", e);
 		} finally {
 			if (hasLock) {
 				lock.unlock();
-				log.info("[closeOrder] 分布式锁解锁");
+				log.info("[closeOrder] 分布式锁解锁, key:{}", CLOSE_ORDER_KEY);
 			}
 		}
 		log.info("[closeOrder] end. cost time:{}ms", System.currentTimeMillis() - begin);
