@@ -47,6 +47,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("orderService")
@@ -482,16 +483,19 @@ public class OrderServiceImpl implements OrderService {
 		}
 		//订单未支付
 		if (order.getStatus().intValue() < Const.OrderStatusEnum.PAID.getCode()) {
-			ServerResponse serverResponse = cancelOrder(order, Const.OrderStatusEnum.ORDER_CLOSE.getCode());
+			ServerResponse serverResponse = cancelOrder(order, Const.OrderStatusEnum.ORDER_DEL.getCode());
 			if (!serverResponse.isSuccess()) {
 				throw new BizException("删除订单失败");
 			}
+			return ServerResponse.success("删除失败成功");
+		} else {
+			order.setStatus(Const.OrderStatusEnum.ORDER_DEL.getCode());
+			int rowCount = orderMapper.update(order);
+			if (rowCount > 0) {
+				return ServerResponse.success("删除失败成功");
+			}
 		}
-		int rowCount = orderMapper.delete(order);
-		if (rowCount > 0) {
-			return ServerResponse.success("删除成功");
-		}
-		return ServerResponse.error("删除失败");
+		return ServerResponse.error("删除失败失败");
 	}
 
 
@@ -564,7 +568,7 @@ public class OrderServiceImpl implements OrderService {
 		query.setCurrentPage(pageNum);
 		query.putOrderBy("id", false);
 		query.setOrderByEnable(true);
-		List<Order> orderList = orderMapper.find(query);
+		List<Order> orderList = orderMapper.find(query).stream().filter(v -> !v.getStatus().equals(Const.OrderStatusEnum.ORDER_DEL.getCode())).collect(Collectors.toList());
 		List<OrderVo> orderVoList = assembleOrderVoList(orderList, userId);
 		PageInfo pageResult = new PageInfo();
 		pageResult.init(orderMapper.count(query), pageNum, pageSize, orderVoList);
