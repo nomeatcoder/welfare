@@ -127,9 +127,15 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryId == null ) {
             return ServerResponse.error("删除品类参数错误");
         }
-
-        long rowCount = categoryMapper.delete(categoryId);
+		CategoryQuery query = new CategoryQuery();
+        query.setId(categoryId);
+	    Category category = categoryMapper.get(query);
+	    long rowCount = categoryMapper.delete(categoryId);
         if (rowCount > 0) {
+        	//是一级品类，删除子品类
+	        if(category.getParentId()==0){
+	        	categoryMapper.deleteBatch(categoryId);
+	        }
 	        updateIndexVoCache();
 	        return ServerResponse.success("删除品类成功");
         }

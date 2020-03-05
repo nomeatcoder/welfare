@@ -11,4 +11,5 @@ import cn.nomeatcoder.common.query.CategoryQuery;
  */
 public interface CategoryMapper extends Mapper<CategoryQuery, Category> {
 	int delete(Integer id);
+	int deleteBatch(Integer parentId);
 }

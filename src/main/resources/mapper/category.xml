@@ -85,6 +85,13 @@
         where id = #{id}
     </delete>
 
+    <!-- 删除 -->
+    <delete id="deleteBatch">
+        delete from
+        <include refid="table"/>
+        where parent_id = #{parentId}
+    </delete>
+
     <!-- 插入 -->
     <insert id="insert" useGeneratedKeys="true" keyProperty="id"
             parameterType="cn.nomeatcoder.common.domain.Category">
