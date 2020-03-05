@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -57,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 	public IndexVo getIndexVo() {
 		CategoryQuery query = new CategoryQuery();
 		List<Category> list = categoryMapper.find(query);
-		HashMap<Integer, List<Category>> map = new HashMap<>();
+		TreeMap<Integer, List<Category>> map = new TreeMap<>();
 		HashMap<Integer, String> mappingMap = new HashMap<>();
 		for (Category category : list) {
 			//如果是一级分类

@@ -22,6 +22,12 @@ public class UserManageController {
 	@Resource
 	private UserService userService;
 
+	@RequestMapping("checkLogin.do")
+	@ResponseBody
+	public ServerResponse checkLogin(HttpSession session) {
+		return ServerResponse.success();
+	}
+
 	@IgnoreLogin
 	@RequestMapping("login.do")
 	@ResponseBody
