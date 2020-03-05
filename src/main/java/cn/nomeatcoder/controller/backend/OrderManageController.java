@@ -1,11 +1,7 @@
 package cn.nomeatcoder.controller.backend;
 
-import cn.nomeatcoder.common.Const;
-import cn.nomeatcoder.common.ResponseCode;
 import cn.nomeatcoder.common.ServerResponse;
-import cn.nomeatcoder.common.domain.User;
 import cn.nomeatcoder.service.OrderService;
-import cn.nomeatcoder.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +16,6 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("manage/order")
 public class OrderManageController {
 
-    @Resource
-    private UserService userService;
     @Resource
     private OrderService orderService;
 

@@ -4,10 +4,12 @@ import cn.nomeatcoder.common.Const;
 import cn.nomeatcoder.common.MyCache;
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.domain.Category;
+import cn.nomeatcoder.common.domain.Product;
 import cn.nomeatcoder.common.query.CategoryQuery;
 import cn.nomeatcoder.common.vo.CategoryDetailVo;
 import cn.nomeatcoder.common.vo.CategoryVo;
 import cn.nomeatcoder.common.vo.IndexVo;
+import cn.nomeatcoder.common.vo.ProductDetailVo;
 import cn.nomeatcoder.dal.mapper.CategoryMapper;
 import cn.nomeatcoder.service.CategoryService;
 import cn.nomeatcoder.utils.GsonUtils;
@@ -108,6 +110,7 @@ public class CategoryServiceImpl implements CategoryService {
 		if (categoryId == 0) {
 			long rowCount = categoryMapper.insert(category);
 			if (rowCount > 0) {
+				updateIndexVoCache();
 				return ServerResponse.success("添加品类成功");
 			}
 			return ServerResponse.error("添加品类失败");
@@ -115,6 +118,7 @@ public class CategoryServiceImpl implements CategoryService {
 			category.setId(categoryId);
 			long rowCount = categoryMapper.update(category);
 			if (rowCount > 0) {
+				updateIndexVoCache();
 				return ServerResponse.success("更新品类成功");
 			}
 			return ServerResponse.error("更新品类失败");
@@ -129,7 +133,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         long rowCount = categoryMapper.delete(categoryId);
         if (rowCount > 0) {
-            return ServerResponse.success("删除品类成功");
+	        updateIndexVoCache();
+	        return ServerResponse.success("删除品类成功");
         }
         return ServerResponse.error("删除品类失败");
     }
@@ -145,6 +150,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 		int rowCount = categoryMapper.update(category);
 		if (rowCount > 0) {
+			updateIndexVoCache();
 			return ServerResponse.success("更新品类名字成功");
 		}
 		return ServerResponse.error("更新品类名字失败");
@@ -208,6 +214,11 @@ public class CategoryServiceImpl implements CategoryService {
 			findChildCategory(categorySet, categoryItem.getId());
 		}
 		return categorySet;
+	}
+
+	private void updateIndexVoCache() {
+		IndexVo indexVo = getIndexVo();
+		myCache.setKey(MyCache.INDEX_INFO_KEY, GsonUtils.toJson(indexVo));
 	}
 
 }
