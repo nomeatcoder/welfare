@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
 				query.setUsername(str);
 				User user = userMapper.get(query);
 				if (user != null) {
-					return ServerResponse.error("用户名已存在");
+					return ServerResponse.error("用户名已存在", user);
 				}
 			}
 			if (Const.EMAIL.equals(type)) {
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
 		}
 		String question = user.getQuestion();
 		if (StringUtils.isNotBlank(question)) {
-			return ServerResponse.success(question);
+			return ServerResponse.success((Object) question);
 		}
 		return ServerResponse.error("找回密码的问题是空的");
 	}
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
 		if (user != null) {
 			String forgetToken = UUID.randomUUID().toString();
 			myCache.setKey(MyCache.TOKEN_PREFIX + username, forgetToken);
-			return ServerResponse.success(forgetToken);
+			return ServerResponse.success((Object) forgetToken);
 		}
 		return ServerResponse.error("问题的答案错误");
 	}
@@ -150,8 +150,11 @@ public class UserServiceImpl implements UserService {
 		if (StringUtils.equals(forgetToken, token)) {
 			String md5Password = MD5Utils.MD5EncodeUtf8(passwordNew, commonProperties.getSalt());
 			User user = new User();
+			if (validResponse.getData() != null) {
+				user.setId(((User) validResponse.getData()).getId());
+			}
 			user.setUsername(username);
-			user.setPassword(passwordNew);
+			user.setPassword(md5Password);
 			int rowCount = userMapper.update(user);
 			if (rowCount > 0) {
 				return ServerResponse.success("修改密码成功");

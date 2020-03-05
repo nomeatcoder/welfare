@@ -42,8 +42,16 @@ public class ServerResponse implements Serializable {
 		return error(1,"操作失败");
 	}
 
+	public static ServerResponse error(String msg, Object data) {
+		return error(1, msg, data);
+	}
+
 	public static ServerResponse error(Integer status, String msg) {
 		return new ServerResponse(status, msg, null);
+	}
+
+	public static ServerResponse error(Integer status, String msg, Object data) {
+		return new ServerResponse(status, msg, data);
 	}
 
 	@JsonIgnore
