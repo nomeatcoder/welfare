@@ -14,7 +14,7 @@ public class Const {
 	public static final String USERNAME = "username";
 	public static final String ASC = "asc";
 	public static final String IMAGE_HOST = "http://image.welfare.com/";
-	public static final String FTP_SERVER_IP = "192.168.0.10";
+	public static final String FTP_SERVER_IP = "192.168.1.10";
 	public static final String FTP_USERNAME = "ftpuser";
 	public static final String FTP_PASSWORD = "123456";
 	//线上域名需要备案,所以本机用内网穿透验证,线上不验证

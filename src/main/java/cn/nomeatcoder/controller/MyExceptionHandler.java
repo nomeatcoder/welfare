@@ -14,7 +14,7 @@ public class MyExceptionHandler {
 		if (e instanceof BizException) {
 			return ServerResponse.error(ResponseCode.ERROR.getCode(), e.getMessage());
 		}
-		return ServerResponse.error(ResponseCode.SERVER_ERROR.getCode(), e.getMessage());
+		return ServerResponse.error(ResponseCode.SERVER_ERROR.getCode(), ResponseCode.SERVER_ERROR.getDesc());
 	}
 
 }

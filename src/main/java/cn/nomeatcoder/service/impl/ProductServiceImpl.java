@@ -55,14 +55,14 @@ public class ProductServiceImpl implements ProductService {
 					updateProductDetailVoCache(product.getId(), product);
 					return ServerResponse.success("更新产品成功");
 				}
-				return ServerResponse.success("更新产品失败");
+				return ServerResponse.error("更新产品失败");
 			} else {
 				int rowCount = (int) productMapper.insert(product);
 				if (rowCount > 0) {
 					updateProductDetailVoCache(product.getId(), product);
 					return ServerResponse.success("新增产品成功");
 				}
-				return ServerResponse.success("新增产品失败");
+				return ServerResponse.error("新增产品失败");
 			}
 		}
 		return ServerResponse.error("新增或更新产品参数不正确");
@@ -130,8 +130,12 @@ public class ProductServiceImpl implements ProductService {
 			productDetailVo.setParentCategoryId(category.getParentId());
 		}
 
-		productDetailVo.setCreateTime(Const.DF.format(product.getCreateTime()));
-		productDetailVo.setUpdateTime(Const.DF.format(product.getUpdateTime()));
+		if(product.getCreateTime()!=null) {
+			productDetailVo.setCreateTime(Const.DF.format(product.getCreateTime()));
+		}
+		if(product.getUpdateTime()!=null) {
+			productDetailVo.setUpdateTime(Const.DF.format(product.getUpdateTime()));
+		}
 		return productDetailVo;
 	}
 
