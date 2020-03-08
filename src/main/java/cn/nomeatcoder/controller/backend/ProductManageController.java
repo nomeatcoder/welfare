@@ -26,8 +26,6 @@ import java.util.Map;
 public class ProductManageController {
 
 	@Resource
-	private UserService userService;
-	@Resource
 	private ProductService productService;
 	@Resource
 	private FileService fileService;

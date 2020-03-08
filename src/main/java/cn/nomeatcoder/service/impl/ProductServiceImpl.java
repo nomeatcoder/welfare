@@ -294,7 +294,7 @@ public class ProductServiceImpl implements ProductService {
 
 
 	private void updateProductDetailVoCache(Integer productId, Product product) {
-		ProductDetailVo productDetailVo = assembleProductDetailVo(product);
+		ProductDetailVo productDetailVo = product == null ? new ProductDetailVo() : assembleProductDetailVo(product);
 		myCache.setKey(String.format(MyCache.PRODUCT_DETAIL_KEY, productId), GsonUtils.toJson(productDetailVo));
 	}
 
