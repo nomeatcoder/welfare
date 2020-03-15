@@ -1,14 +1,16 @@
 package cn.nomeatcoder.application;
 
+import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.query.UserQuery;
 import cn.nomeatcoder.config.RedissonConfig;
 import cn.nomeatcoder.dal.mapper.UserMapper;
+import cn.nomeatcoder.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.spring.annotation.MapperScan;
 import org.redisson.Redisson;
-import org.redisson.RedissonLock;
 import org.redisson.api.RLock;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
@@ -38,6 +40,9 @@ public class AppTest {
 	@Resource
 	private Redisson redisson;
 
+	@Resource
+	private UserService userService;
+
 	@Test
 	public void test() {
 		System.out.println("success");
@@ -65,6 +70,14 @@ public class AppTest {
 		RLock testLock = redisson.getLock("testLock");
 		testLock.lock(5, TimeUnit.SECONDS);
 		testLock.unlock();
+	}
+
+	@Test
+	public void testLoginSuccess() {
+		String username = "admin";
+		String password = "admin";
+		ServerResponse response = userService.login(username, password);
+		Assert.assertTrue(response.isSuccess());
 	}
 
 	@SpringBootApplication

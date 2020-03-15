@@ -1,5 +1,6 @@
 package cn.nomeatcoder.application;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,8 +24,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 })
 @EnableTransactionManagement
 @EnableScheduling
+@Slf4j
 public class App {
     public static void main( String[] args ) {
+        log.debug("debug");
+        log.info("debug");
+        log.error("debug");
+        log.warn("debug");
         SpringApplication.run(App.class, args);
 //        log.info("---------------------started-----------------------");
     }
