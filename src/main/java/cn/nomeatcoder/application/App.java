@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     "cn.nomeatcoder.common",
     "cn.nomeatcoder.config",
     "cn.nomeatcoder.schedule",
+    "cn.nomeatcoder.utils",
 })
 @MapperScan(basePackages = {
     "cn.nomeatcoder.dal.mapper"

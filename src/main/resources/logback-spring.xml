@@ -11,10 +11,10 @@
     </appender>
 
     <appender name="welfare" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>/logs/welfare/welfare.log</File>
+        <File>/usr/local/logs/welfare.log</File>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/logs/welfare/welfare.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <fileNamePattern>/usr/local/logs/welfare.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -25,10 +25,10 @@
 
 
     <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>/logs/welfare/error.log</File>
+        <File>/usr/local/logs/error.log</File>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/logs/welfare/error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <fileNamePattern>/usr/local/logs/error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -43,10 +43,10 @@
     </appender>
 
     <appender name="PrintParamResult" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/welfare/facade-param.log</file>
+        <file>/usr/local/logs/facade-param.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>/logs/welfare/facade-param.log.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <FileNamePattern>/usr/local/logs/facade-param.log.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
             <maxHistory>7</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -59,10 +59,10 @@
     </appender>
 
     <appender name="PERFORMANCE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/welfare/performance.log</file>
+        <file>/usr/local/logs/performance.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>/logs/welfare/performance.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <FileNamePattern>/usr/local/logs/performance.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
             <maxHistory>7</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -75,10 +75,10 @@
     </appender>
 
     <appender name="SQL" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/welfare/sql.log</file>
+        <file>/usr/local/logs/sql.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>/logs/welfare/sql.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <FileNamePattern>/usr/local/logs/sql.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
             <maxHistory>7</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>

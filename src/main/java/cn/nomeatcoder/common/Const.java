@@ -2,6 +2,9 @@ package cn.nomeatcoder.common;
 
 import cn.nomeatcoder.common.exception.BizException;
 import com.google.common.collect.Sets;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Set;
@@ -14,11 +17,6 @@ public class Const {
 	public static final String USERNAME = "username";
 	public static final String ASC = "asc";
 	public static final String IMAGE_HOST = "http://image.welfare.com/";
-	public static final String FTP_SERVER_IP = "192.168.1.10";
-	public static final String FTP_USERNAME = "ftpuser";
-	public static final String FTP_PASSWORD = "123456";
-	//线上域名需要备案,所以本机用内网穿透验证,线上不验证
-	public static final String ALIPAY_CALLBACK_URL = "http://dfuyyu.natappfree.cc/order/alipay_callback.do";
 	public static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static final int REDIS_EXPIRE_TIME = 5;
 	public static final int CLOSE_ORDER_TIME = 15;

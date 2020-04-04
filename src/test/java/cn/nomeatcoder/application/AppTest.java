@@ -2,32 +2,23 @@ package cn.nomeatcoder.application;
 
 import cn.nomeatcoder.common.ServerResponse;
 import cn.nomeatcoder.common.query.UserQuery;
-import cn.nomeatcoder.config.RedissonConfig;
 import cn.nomeatcoder.dal.mapper.UserMapper;
 import cn.nomeatcoder.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mybatis.spring.annotation.MapperScan;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(
-	locations = {"classpath:application-test.properties"}
-)
-@MapperScan(basePackages = {
-	"cn.nomeatcoder.dal.mapper",
-})
+@SpringBootTest(classes = {App.class})
 @Slf4j
 public class AppTest {
 
@@ -78,11 +69,5 @@ public class AppTest {
 		String password = "admin";
 		ServerResponse response = userService.login(username, password);
 		Assert.assertTrue(response.isSuccess());
-	}
-
-	@SpringBootApplication
-	@Import(RedissonConfig.class)
-	public static class Config{
-
 	}
 }

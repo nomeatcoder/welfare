@@ -14,23 +14,26 @@ import java.util.List;
 @Configuration
 public class RedissonConfig {
 
-	@Value("${spring.redis.sentinel.nodes}")
-	private String sentinelNodes;
+	@Value("${spring.redis.host}")
+	private String host;
 
-	@Value("${spring.redis.sentinel.master}")
-	private String master;
+	@Value("${spring.redis.port}")
+	private Integer port;
+
+	@Value("${spring.redis.password}")
+	private String password;
+
+	@Value("${spring.redis.database}")
+	private Integer database;
 
 	@Bean
 	public Redisson redisson() {
 		Config config = new Config();
-		String[] nodes = sentinelNodes.split(",");
-		List<String> newNodes = new ArrayList(nodes.length);
-		Arrays.stream(nodes).forEach((index) -> newNodes.add(
-			index.startsWith("redis://") ? index : "redis://" + index));
-		config.useSentinelServers()
-			.addSentinelAddress(newNodes.toArray(new String[0]))
-			.setMasterName(master)
-			.setReadMode(ReadMode.SLAVE);
+		String address = "redis://"+host+":"+port;
+		config.useSingleServer()
+			.setAddress(address)
+			.setDatabase(database)
+			.setPassword(password);
 
 		return (Redisson) Redisson.create(config);
 	}

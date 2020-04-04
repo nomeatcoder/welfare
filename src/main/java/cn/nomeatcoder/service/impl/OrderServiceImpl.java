@@ -1,9 +1,6 @@
 package cn.nomeatcoder.service.impl;
 
-import cn.nomeatcoder.common.Const;
-import cn.nomeatcoder.common.MyCache;
-import cn.nomeatcoder.common.PageInfo;
-import cn.nomeatcoder.common.ServerResponse;
+import cn.nomeatcoder.common.*;
 import cn.nomeatcoder.common.async.InternalEventBus;
 import cn.nomeatcoder.common.domain.*;
 import cn.nomeatcoder.common.exception.BizException;
@@ -54,6 +51,12 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
 	private static final String UPDATE_STOCK_KEY = "welfare_update_stock_%s";
+
+	@Resource
+	private CommonProperties commonProperties;
+
+	@Resource
+	private FTPUtils ftpUtils;
 
 	@Resource
 	private OrderMapper orderMapper;
@@ -688,7 +691,7 @@ public class OrderServiceImpl implements OrderService {
 			.setUndiscountableAmount(undiscountableAmount).setSellerId(sellerId).setBody(body)
 			.setOperatorId(operatorId).setStoreId(storeId).setExtendParams(extendParams)
 			.setTimeoutExpress(timeoutExpress)
-			.setNotifyUrl(Const.ALIPAY_CALLBACK_URL)//支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
+			.setNotifyUrl(commonProperties.getCallback())//支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
 			.setGoodsDetailList(goodsDetailList);
 
 
@@ -714,7 +717,7 @@ public class OrderServiceImpl implements OrderService {
 
 				File targetFile = new File(path, qrFileName);
 				try {
-					FTPUtils.uploadFile(Lists.newArrayList(targetFile));
+					ftpUtils.uploadFile(Lists.newArrayList(targetFile));
 				} catch (IOException e) {
 					log.error("上传二维码异常", e);
 				}

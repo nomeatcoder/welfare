@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -16,6 +17,10 @@ import java.util.UUID;
 @Slf4j
 @Service("fileService")
 public class FileServiceImpl implements FileService {
+
+	@Resource
+	private FTPUtils ftpUtils;
+
 	@Override
 	public String upload(MultipartFile file, String path) {
 		String fileName = file.getOriginalFilename();
@@ -38,7 +43,7 @@ public class FileServiceImpl implements FileService {
 			//文件已经上传成功了
 
 
-			FTPUtils.uploadFile(Lists.newArrayList(targetFile));
+			ftpUtils.uploadFile(Lists.newArrayList(targetFile));
 			//已经上传到ftp服务器上
 
 //            targetFile.delete();
