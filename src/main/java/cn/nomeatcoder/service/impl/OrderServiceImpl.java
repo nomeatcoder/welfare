@@ -749,10 +749,13 @@ public class OrderServiceImpl implements OrderService {
 		if (order == null) {
 			return ServerResponse.error("用户没有该订单");
 		}
-		if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode() && order.getStatus() <= Const.OrderStatusEnum.ORDER_CLOSE.getCode()) {
-			return ServerResponse.success();
+		if (order.getStatus() >= Const.OrderStatusEnum.PAID.getCode() && order.getStatus() <= Const.OrderStatusEnum.ORDER_SUCCESS.getCode()) {
+			return ServerResponse.success(1);
 		}
-		return ServerResponse.error();
+		if (order.getStatus() == Const.OrderStatusEnum.ORDER_CLOSE.getCode()){
+			return ServerResponse.success(2);
+		}
+		return ServerResponse.success(0);
 	}
 
 	// 简单打印应答

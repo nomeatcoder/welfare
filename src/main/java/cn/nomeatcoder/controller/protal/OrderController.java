@@ -161,11 +161,7 @@ public class OrderController {
 			return ServerResponse.error(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
 		}
 
-		ServerResponse serverResponse = orderService.queryOrderPayStatus(user.getId(),orderNo);
-		if(serverResponse.isSuccess()){
-			return ServerResponse.success(true);
-		}
-		return ServerResponse.success(false);
+		return orderService.queryOrderPayStatus(user.getId(), orderNo);
 	}
 
 }
