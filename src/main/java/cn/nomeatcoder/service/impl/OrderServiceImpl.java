@@ -775,6 +775,8 @@ public class OrderServiceImpl implements OrderService {
 		OrderQuery query = new OrderQuery();
 		query.setPageSize(pageSize);
 		query.setCurrentPage(pageNum);
+		query.putOrderBy("id", false);
+		query.setOrderByEnable(true);
 		List<Order> orderList = orderMapper.find(query);
 		List<OrderVo> orderVoList = this.assembleOrderVoList(orderList, null);
 		PageInfo pageResult = new PageInfo();
